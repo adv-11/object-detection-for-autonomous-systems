@@ -1,0 +1,14 @@
+# data, weights and run artifacts stay out of version control
+datasets/
+weights/
+runs/
+*.pt
+*.pth
+*.onnx
+*.engine
+results/**/predictions*.json
+results/**/*.cache
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

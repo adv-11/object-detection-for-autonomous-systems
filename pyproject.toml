@@ -1,0 +1,34 @@
+[project]
+name = "det-eval"
+version = "0.1.0"
+description = "Reproducible evaluation of modern 2D object detectors on COCO and KITTI (CMPE 249, Track A)"
+readme = "README.md"
+authors = [{ name = "Advait Shinde" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch>=2.7",
+    "torchvision>=0.22",
+    "ultralytics>=8.3",
+    "transformers>=4.50",
+    "pycocotools>=2.0.8",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "pillow",
+    "tqdm",
+    "pyyaml",
+    "tabulate",
+]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu128" }]
+torchvision = [{ index = "pytorch-cu128" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[build-system]
+requires = ["uv_build>=0.12.11,<0.13.0"]
+build-backend = "uv_build"
