@@ -1,0 +1,1 @@
+[2026-11-01 15:01:46] uv run python scripts/run_inference.py --model faster_rcnn_r50_v2 --dataset coco

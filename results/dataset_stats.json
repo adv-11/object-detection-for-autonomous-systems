@@ -1,0 +1,52 @@
+{
+ "COCO/person": {
+  "n": 10777,
+  "median_height_px": 83.12,
+  "small": 29.74853855432866,
+  "medium": 34.53651294423309,
+  "large": 35.71494850143825
+ },
+ "KITTI/Pedestrian": {
+  "n": 2280,
+  "median_height_px": 95.74,
+  "small": 16.973684210526315,
+  "medium": 56.75438596491228,
+  "large": 26.2719298245614
+ },
+ "COCO/car": {
+  "n": 1918,
+  "median_height_px": 25.715,
+  "small": 52.39833159541188,
+  "medium": 35.140771637122,
+  "large": 12.46089676746611
+ },
+ "KITTI/Car": {
+  "n": 14385,
+  "median_height_px": 50.16,
+  "small": 15.842891901286063,
+  "medium": 50.775112964893985,
+  "large": 33.381995133819956
+ },
+ "COCO/bicycle": {
+  "n": 314,
+  "median_height_px": 59.894999999999996,
+  "small": 28.02547770700637,
+  "medium": 41.71974522292994,
+  "large": 30.254777070063692
+ },
+ "KITTI/Cyclist": {
+  "n": 893,
+  "median_height_px": 55.98000000000002,
+  "small": 35.38633818589026,
+  "medium": 47.59238521836507,
+  "large": 17.02127659574468
+ },
+ "COCO/image_size": {
+  "median_w": 640.0,
+  "median_h": 480.0
+ },
+ "KITTI/image_size": {
+  "median_w": 1242.0,
+  "median_h": 375.0
+ }
+}
