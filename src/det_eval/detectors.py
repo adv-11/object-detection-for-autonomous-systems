@@ -106,7 +106,7 @@ class UltralyticsDetector(Detector):
             conf=SCORE_THRESH,
             iou=self.nms_iou or 0.7,
             max_det=300,
-            half=self.half,
+            quantize=16 if self.half else None,  # None -> FP32 for PyTorch weights
             verbose=False,
         )[0]
         b = r.boxes

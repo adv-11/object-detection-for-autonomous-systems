@@ -121,6 +121,6 @@ def coco_to_kitti(boxes, scores, names, strategy="fused"):
 
 def prompts_to_kitti(boxes, scores, names):
     names = np.asarray(names)
-    cls = np.array([PROMPT_TO_KITTI.get(n) for n in names], dtype=object)
+    cls = np.array([PROMPT_TO_KITTI.get(str(n).lower()) for n in names], dtype=object)
     keep = cls != None  # noqa: E711 (elementwise)
     return boxes[keep], scores[keep], cls[keep]
