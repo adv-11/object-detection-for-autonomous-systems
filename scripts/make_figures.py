@@ -30,25 +30,32 @@ def short(name):
 
 # ----------------------------------------------------------------------------- 1. speed vs accuracy
 def fig_speed_accuracy():
-    """COCO AP vs. median batch-1 FP32 latency (full predict(), measured during the COCO run)."""
+    """COCO AP vs. median batch-1 latency from the dedicated benchmark (FP32 and FP16 panels)."""
+    sp = pd.DataFrame(json.loads((ROOT / "results" / "speed" / "speed.json").read_text())["rows"])
+    sp = sp[sp.domain == "coco"].dropna(subset=["ms_p50"])
     coco = pd.read_csv(ROOT / "results" / "tables" / "coco.csv")
-    fig, ax = plt.subplots(figsize=(5.4, 3.0))
-    for _, r in coco.iterrows():
-        g = plotstyle.group_of(r.family)
-        ax.scatter(r.ms_per_img, r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white", linewidth=1.5,
-                   zorder=3, label=g)
-        ax.annotate(short(r.model).replace("@640", ""), (r.ms_per_img, r.AP), xytext=(5, -3),
-                    textcoords="offset points", fontsize=6.8, color=plotstyle.TEXT)
-    ax.set_xscale("log")
+    fig, axes = plt.subplots(1, 2, figsize=(7.8, 2.9), sharey=True)
     ticks = [20, 30, 50, 100, 200, 500]
-    ax.set_xticks(ticks, [str(t) for t in ticks])
-    ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter())
-    ax.set_xlim(20, 700)
-    ax.set_xlabel("median latency per image, batch 1, FP32, RTX 5060 Laptop 45 W (ms, log)")
-    ax.set_ylabel("COCO val2017 AP@[.50:.95]")
-    h, l = ax.get_legend_handles_labels()
+    for ax, prec in zip(axes, ("fp32", "fp16")):
+        s_ = sp[sp.precision == prec].set_index("model")
+        for _, r in coco.iterrows():
+            if r.model not in s_.index:
+                continue
+            x = s_.loc[r.model, "ms_p50"]
+            g = plotstyle.group_of(r.family)
+            ax.scatter(x, r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white", linewidth=1.5, zorder=3, label=g)
+            ax.annotate(short(r.model).replace("@640", ""), (x, r.AP), xytext=(5, -3), textcoords="offset points",
+                        fontsize=6.6, color=plotstyle.TEXT)
+        ax.set_xscale("log")
+        ax.set_xticks(ticks, [str(t) for t in ticks])
+        ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter())
+        ax.set_xlim(18, 800)
+        ax.set_xlabel(f"median latency, batch 1, {prec.upper()} (ms, log)")
+        ax.set_title(f"{prec.upper()}", loc="left")
+    axes[0].set_ylabel("COCO val2017 AP@[.50:.95]")
+    h, l = axes[0].get_legend_handles_labels()
     uniq = dict(zip(l, h))
-    ax.legend(uniq.values(), uniq.keys(), loc="lower right", fontsize=7)
+    fig.legend(uniq.values(), uniq.keys(), loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.07), fontsize=7.5)
     fig.savefig(FIG / "fig_speed_accuracy.png")
 
 
@@ -227,12 +234,13 @@ def main():
     fig_domain_shift()
     fig_resolution()
     analysed = [("kitti__faster_rcnn_r50_v2", "Faster R-CNN (zero-shot)"),
-                ("kitti__rtdetr_l_640", "RT-DETR-L@640 (zero-shot)"),
-                ("kitti__yolo11s_640", "YOLO11s@640 (zero-shot)"),
-                ("kitti__yolo11s_640_ft", "YOLO11s@640 (fine-tuned)")]
+                ("kitti__grounding_dino_t_vcoco", "Grounding DINO-T (zero-shot)"),
+                ("kitti__yolo11s_1280", "YOLO11s@1280 (zero-shot)"),
+                ("kitti__yolo11s_1280_ft", "YOLO11s@1280 (fine-tuned)")]
     fig_recall_height(analysed)
     fig_fp_taxonomy(analysed)
-    fig_finetune("kitti__yolo11s_640", [("kitti__yolo11s_640_ft", "KITTI train, 5 epochs")])
+    fig_finetune("kitti__yolo11s_1280", [("kitti__yolo11s_1280_ft25", "25% of train"),
+                                         ("kitti__yolo11s_1280_ft", "100% of train")])
     print("figures:", sorted(p.name for p in FIG.glob("*.png")))
 
 

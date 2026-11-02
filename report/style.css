@@ -50,7 +50,7 @@ figure { margin: 4pt 0 6pt; break-inside: avoid; text-align: center; }
 figure img { max-width: 100%; }
 figcaption { font-size: 9pt; color: var(--ink); text-align: left; margin-top: 4pt; font-style: italic; }
 
-ol.refs { font-size: 8pt; line-height: 1.1; padding-left: 0.3in; }
-ol.refs li { margin: 0 0 1pt; }
+ol.refs { font-size: 7.7pt; line-height: 1.08; padding-left: 0.3in; }
+ol.refs li { margin: 0; }
 .keyfinding { margin: 0 0 8pt; }
 .pagebreak { break-before: page; }

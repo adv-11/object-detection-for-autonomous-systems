@@ -24,6 +24,19 @@ PUBLISHED = {  # verified from primary sources (see report references)
 }
 
 
+def _speed():
+    p = ROOT / "results" / "speed" / "speed.json"
+    out = {}
+    if p.exists():
+        for r in json.loads(p.read_text())["rows"]:
+            if r["domain"] == "coco" and "ms_p50" in r:
+                out.setdefault(r["model"].replace("@640", "@640"), {})[r["precision"]] = r
+    return out
+
+
+SPEED = _speed()
+
+
 def load(run):
     p = MET / f"{run}.json"
     return json.loads(p.read_text()) if p.exists() else None
@@ -59,26 +72,34 @@ def coco_table():
         m = load(run)
         if not m:
             continue
-        s, t = m["metrics"]["coco"]["summary"], m["meta"]["timing"]
+        s = m["metrics"]["coco"]["summary"]
+        sp = SPEED.get(m["meta"]["detector"]["name"], {})
+        p32, p16 = sp.get("fp32", {}), sp.get("fp16", {})
+        params = params or p32.get("params_m")
         rows.append([name, fam, f(params) if params else "–", f(s["AP"]), pub, f(s["AP50"]), f(s["AP75"]),
-                     f(s["APs"]), f(s["APm"]), f(s["APl"]), f(s["AR100"]), f(t["model_ms_median"], 0),
-                     f(m["meta"]["peak_mem_mb"] / 1024, 2)])
+                     f(s["APs"]), f(s["APm"]), f(s["APl"]), f(s["AR100"]), f(p32.get("ms_p50"), 0), f(p16.get("ms_p50"), 0),
+                     f(p32["peak_mem_mb"] / 1024, 2) if p32 else "–"])
     rows.sort(key=lambda r: -float(r[3]))
     rows = bold_max(rows, [3, 5, 6, 7, 8, 9, 10])
-    return md(["Model", "Family", "Params (M)", "AP", "Publ. AP", "AP50", "AP75", "APs", "APm", "APl", "AR100", "ms/img", "Mem (GB)"],
-              rows, ["l", "l"] + ["r"] * 11)
+    return md(["Model", "Family", "Params (M)", "AP", "Publ. AP", "AP50", "AP75", "APs", "APm", "APl", "AR100", "FP32 ms", "FP16 ms", "Mem (GB)"],
+              rows, ["l", "l"] + ["r"] * 12)
 
 
 KITTI_RUNS = [
     ("kitti__faster_rcnn_r50_v2", "Faster R-CNN R50-FPN v2", "~1333×402"),
+    ("kitti__retinanet_r50_v2", "RetinaNet R50-FPN v2", "~1333×402"),
+    ("kitti__fcos_r50", "FCOS R50-FPN", "~1333×402"),
     ("kitti__yolo11s_640", "YOLO11s", "640×194"),
+    ("kitti__yolo11s_1280", "YOLO11s", "1280×387"),
     ("kitti__yolo11m_640", "YOLO11m", "640×194"),
     ("kitti__yolo11m_1280", "YOLO11m", "1280×387"),
     ("kitti__rtdetr_l_640", "RT-DETR-L", "640×640†"),
-    ("kitti__yolo_world_l_1280_vcoco", "YOLO-World-L (COCO vocab.)", "1280×387"),
-    ("kitti__yolo_world_l_1280_vkitti", "YOLO-World-L (KITTI prompts)", "1280×387"),
-    ("kitti__grounding_dino_t_vkitti", "Grounding DINO-T (KITTI prompts)", "~1333×402"),
-    ("kitti__yolo11s_640_ft", "YOLO11s fine-tuned on KITTI", "640×194"),
+    ("kitti__rtdetr_l_1280", "RT-DETR-L", "1280×1280†"),
+    ("kitti__yolo_world_l_1280_vcoco", "YOLO-World-L v2", "1280×387"),
+    ("kitti__grounding_dino_t_vcoco", "Grounding DINO-T", "~1333×402"),
+    ("kitti__yolo11s_640_ft", "YOLO11s FT, 5 ep., 100% train", "640×194"),
+    ("kitti__yolo11s_1280_ft25", "YOLO11s FT, 20 ep., 25% train", "1280×387"),
+    ("kitti__yolo11s_1280_ft", "YOLO11s FT, 20 ep., 100% train", "1280×387"),
 ]
 
 
@@ -98,7 +119,7 @@ def kitti_table():
         rows.append([name, inp, f(s["AP"]), f(s["AP50"]), f(s["APs"]), f(cs["Car"]), f(cs["Pedestrian"]), f(cs["Cyclist"]),
                      f(r40["moderate"]["Car"]), f(r40["moderate"]["Pedestrian"]), f(r40["moderate"]["Cyclist"]),
                      f(r40["easy"]["mAP"]), f(r40["moderate"]["mAP"]), f(r40["hard"]["mAP"])])
-    zs = [r for r in rows if "fine-tuned" not in r[0]]
+    zs = [r for r in rows if " FT," not in r[0]]
     bold_max(zs, list(range(2, 14)))
     return md(["Model", "Input", "AP", "AP50", "APs", "Car", "Ped", "Cyc", "Car", "Ped", "Cyc", "Easy", "Mod.", "Hard"],
               rows, ["l", "l"] + ["r"] * 12)
@@ -120,10 +141,11 @@ def mapping_table():
 
 def prompt_table():
     rows = []
-    for run, lab in (("kitti__yolo_world_l_1280_vcoco", "YOLO-World-L: 80 COCO names + mapping"),
+    for run, lab in (("kitti__grounding_dino_t_vcoco", "Grounding DINO-T: 80 COCO names + mapping"),
+                     ("kitti__grounding_dino_t_vkitti", "Grounding DINO-T: KITTI names"),
+                     ("kitti__yolo_world_l_1280_vcoco", "YOLO-World-L: 80 COCO names + mapping"),
                      ("kitti__yolo_world_l_1280_vkitti", "YOLO-World-L: KITTI names (car, pedestrian, cyclist, ...)"),
-                     ("kitti__yolo_world_l_1280_vkittidesc", "YOLO-World-L: KITTI names, 'person riding a bicycle'"),
-                     ("kitti__grounding_dino_t_vkitti", "Grounding DINO-T: KITTI names")):
+                     ("kitti__yolo_world_l_1280_vkittidesc", "YOLO-World-L: KITTI names, 'person riding a bicycle'")):
         m = load(run)
         if not m:
             continue
@@ -137,8 +159,9 @@ def prompt_table():
 def failure_table():
     fdir = ROOT / "results" / "failures"
     rows = []
-    for run, lab in (("kitti__faster_rcnn_r50_v2", "Faster R-CNN"), ("kitti__rtdetr_l_640", "RT-DETR-L@640"),
-                     ("kitti__yolo11s_640", "YOLO11s@640 zero-shot"), ("kitti__yolo11s_640_ft", "YOLO11s@640 fine-tuned")):
+    for run, lab in (("kitti__faster_rcnn_r50_v2", "Faster R-CNN"), ("kitti__grounding_dino_t_vcoco", "Grounding DINO-T"),
+                     ("kitti__yolo_world_l_1280_vcoco", "YOLO-World-L@1280"),
+                     ("kitti__yolo11s_1280", "YOLO11s@1280 zero-shot"), ("kitti__yolo11s_1280_ft", "YOLO11s@1280 fine-tuned")):
         p = fdir / f"{run}.json"
         if not p.exists():
             continue

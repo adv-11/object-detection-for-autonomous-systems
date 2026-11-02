@@ -1,0 +1,15 @@
+{
+ "name": "yolo11s_kitti_1280_e20_f0.25",
+ "args": {
+  "model": "yolo11s.pt",
+  "imgsz": 1280,
+  "epochs": 20,
+  "batch": 4,
+  "fraction": 0.25,
+  "seed": 0,
+  "name": null
+ },
+ "train_hours": 0.38,
+ "peak_mem_gb": 4.62,
+ "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.25\\weights\\last.pt"
+}

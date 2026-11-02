@@ -11,21 +11,24 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 
 | | COCO AP (ours / published) | KITTI Moderate mAP (AP\|R40, zero-shot) |
 |---|---|---|
-| RT-DETR-L | 52.6 / 53.0 | 60.7 (640², stretched) |
-| YOLO11m | 51.0 / 51.5 | 57.7 (640) · **65.3 (1280)** |
-| Grounding DINO-T | 48.3 / 48.4 | 39.9 (KITTI-name prompts only) |
+| RT-DETR-L | 52.6 / 53.0 | 60.7 (640², stretched) · 65.3 (1280²) |
+| YOLO11m | 51.0 / 51.5 | 57.7 (640) · 65.3 (1280) |
+| Grounding DINO-T | 48.3 / 48.4 | **70.5** (COCO names + mapping) · 39.9 (KITTI-name prompts) |
 | Faster R-CNN R50-FPN v2 | 46.9 / 46.7 | 58.8 |
-| YOLO11s | 46.1 / 47.0 | 52.1 (640) → **65.8 after 5-epoch fine-tune** |
-| YOLO-World-L v2 | 45.1 / 45.1 | **70.9 (1280, best zero-shot)** · 46.4 with KITTI-name prompts |
-| RetinaNet R50-FPN v2 | 41.4 / 41.5 | – |
-| FCOS R50-FPN | 39.2 / 39.2 | – |
+| YOLO11s | 46.1 / 47.0 | 52.1 (640) · 64.4 (1280) → **75.5 fine-tuned** (77.0 with 25% of labels) |
+| YOLO-World-L v2 | 45.1 / 45.1 | **70.9** (COCO names + mapping) · 46.4 (KITTI-name prompts) |
+| RetinaNet R50-FPN v2 | 41.4 / 41.5 | 56.1 |
+| FCOS R50-FPN | 39.2 / 39.2 | 53.7 |
 
 * Car transfers from COCO to KITTI almost unchanged (COCO-style AP 49.9 → 50.4 for Faster R-CNN); Pedestrian and Cyclist lose about
   two-thirds of their AP to taxonomy, box-convention and resize effects.
-* Keeping KITTI's 1242-px frames at 1280 px instead of 640 adds 7.6 Moderate mAP to YOLO11m without retraining.
-* Mapping COCO `bicycle` to KITTI Cyclist naively gives 0.4 AP; fusing rider and bike gives up to 51.
-* YOLO-World-L, sixth on COCO, is the best zero-shot KITTI detector; prompting it with KITTI class names instead of COCO names is much worse.
-* 5 epochs (8 min) of fine-tuning lift YOLO11s from 52.1 to 65.8 Moderate mAP, mostly by fixing localisation at KITTI's 0.7 Car IoU.
+* Keeping KITTI's 1242-px frames at 1280 px instead of 640 adds 5–12 Moderate mAP without retraining and erases the YOLO/RT-DETR gap.
+* Mapping COCO `bicycle` to KITTI Cyclist naively gives <1 AP; fusing rider and bike gives up to 68.
+* The open-vocabulary models (sixth and third on COCO) are the best zero-shot KITTI detectors, but prompting them with KITTI class names
+  instead of COCO names costs 25–31 points.
+* Fine-tuning YOLO11s for 20 epochs at 1280 px lifts it from 64.4 to 75.5 Moderate mAP (77.0 with a quarter of the labels), mostly by
+  fixing localisation at KITTI's 0.7 Car IoU.
+* FP16 speeds up the heavier models 1.1–1.6× on this GPU; batch-1 YOLO latency (~23 ms) is bound by Python pre/post-processing.
 
 ## Reproduce
 
@@ -53,8 +56,9 @@ uv run python scripts/analyze_failures.py kitti__yolo11s_640 kitti__yolo11s_640_
 uv run python scripts/make_figures.py && bash report/build.sh
 ```
 
-The exact runs in the report are in [`scripts/run_reduced.sh`](scripts/run_reduced.sh) and
-[`scripts/run_finetune_short.sh`](scripts/run_finetune_short.sh) (plus the COCO part of `scripts/run_sweep.sh`);
+The exact runs in the report are in [`scripts/run_reduced.sh`](scripts/run_reduced.sh),
+[`scripts/run_finetune_short.sh`](scripts/run_finetune_short.sh) and [`scripts/run_overnight.sh`](scripts/run_overnight.sh)
+(plus the COCO part of `scripts/run_sweep.sh`);
 [`scripts/run_all.sh`](scripts/run_all.sh) is the full, longer queue. Every executed command with timestamps, throughput and
 peak memory is in [`logs/command_log.txt`](logs/command_log.txt).
 
@@ -74,8 +78,7 @@ peak memory is in [`logs/command_log.txt`](logs/command_log.txt).
 
 ## Scope note
 
-The study was time-boxed to a single laptop GPU. Fine-tuning is one seed of YOLO11s at 640 px for 5 epochs (YOLO11m at 1280 px does not
-fit in 8 GB). RetinaNet, FCOS and RT-DETR at 1280 px were evaluated on COCO only, and Grounding DINO on KITTI with one vocabulary.
+Single 8-GB laptop GPU. Fine-tuning uses YOLO11s with one seed per configuration (YOLO11m at 1280 px does not fit in 8 GB for training).
 Raw prediction files (`results/raw/`) and weights are not committed (size); every metric file records how to regenerate them.
 
 ## Data splits
