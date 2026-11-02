@@ -14,3 +14,9 @@
 [2026-11-01 21:54:35] uv run python scripts/evaluate.py
 kitti__grounding_dino_t_vcoco                 [fused_loose] AP  30.5  AP50  68.0  KITTI-mod Car  73.0 Ped  66.5 Cyc  64.3
 kitti__grounding_dino_t_vcoco                 [direct     ] AP  23.6  AP50  45.0  KITTI-mod Car  73.0 Ped  56.8 Cyc   0.7
+[2026-11-01 21:56:57] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 1.0
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f1[0m
+{"name": "yolo11s_kitti_1280_e20_f1", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 1.0, "seed": 0, "name": null}, "train_hours": 1.24, "peak_mem_gb": 4.64, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f1\\weights\\last.pt"}
+[2026-11-01 23:11:40] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f1/weights/last.pt --tag ft
+{"wall_s": 169.4, "images_per_s": 22.25, "model_ms_mean": 44.44, "model_ms_median": 44.5, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=105028
+[2026-11-01 23:15:12] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25
