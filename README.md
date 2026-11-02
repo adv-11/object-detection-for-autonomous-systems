@@ -13,7 +13,7 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 |---|---|---|
 | RT-DETR-L | 52.6 / 53.0 | 60.7 (640², stretched) |
 | YOLO11m | 51.0 / 51.5 | 57.7 (640) · **65.3 (1280)** |
-| Grounding DINO-T | 48.3 / 48.4 | see report |
+| Grounding DINO-T | 48.3 / 48.4 | 39.9 (KITTI-name prompts only) |
 | Faster R-CNN R50-FPN v2 | 46.9 / 46.7 | 58.8 |
 | YOLO11s | 46.1 / 47.0 | 52.1 (640) → **65.8 after 5-epoch fine-tune** |
 | YOLO-World-L v2 | 45.1 / 45.1 | **70.9 (1280, best zero-shot)** · 46.4 with KITTI-name prompts |

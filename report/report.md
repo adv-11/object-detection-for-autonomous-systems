@@ -235,7 +235,8 @@ name is identical in both vocabularies, barely moves (79.7 → 76.2). "Pedestria
 compared with "person" and "bicycle", so their text embeddings are poorly grounded, and a phrase describes a relation (person *on*
 bicycle) that a region-text matcher scores on the person region alone, so the predicted box misses the bike. The promise of
 open-vocabulary detection — "just name the target classes" — did not hold here: the closed-set-style vocabulary plus an explicit
-geometric mapping beat every KITTI-native prompt.
+geometric mapping beat every KITTI-native prompt. Grounding DINO-T, the DETR-style open-vocabulary model, confirms the pattern with
+KITTI names: Car 75.6 Moderate, close to the closed-set models, but Pedestrian 25.7 and Cyclist 18.4, the weakest people results in the study.
 
 ## 5.5 Speed–accuracy trade-off
 
