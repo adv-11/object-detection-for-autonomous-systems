@@ -92,8 +92,11 @@ def main():
             for domain in domains:
                 if det.open_vocab:
                     det.set_vocabulary(VOCABULARIES["coco"])
-                r = dict(model=det.name, key=key, domain=domain, precision="fp16" if half else "fp32",
-                         params_m=round(n_params(det), 1), **bench(det, data[domain]))
+                try:
+                    r = dict(model=det.name, key=key, domain=domain, precision="fp16" if half else "fp32",
+                             params_m=round(n_params(det), 1), **bench(det, data[domain]))
+                except Exception as e:  # e.g. an op without FP16 support: record and keep going
+                    r = dict(model=det.name, key=key, domain=domain, precision="fp16" if half else "fp32", error=repr(e)[:200])
                 print(r, flush=True)
                 rows.append(r)
             del det
