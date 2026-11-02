@@ -4,12 +4,16 @@ Protocols
 ---------
 coco        Standard COCOeval (IoU 0.50:0.95, 101-point AP, area ranges, maxDets 100).
 kitti-coco  COCOeval on KITTI val, 3 classes, every labelled object counts (no
-            difficulty filter); DontCare / neighbour classes are ignore regions.
+            difficulty filter); DontCare is a crowd region, neighbour classes are
+            IoU-matched one-to-one ignores (see data.py).
 kitti-<d>   KITTI devkit style for d in {easy, moderate, hard}: objects failing the
-            difficulty criteria become ignore regions, detections shorter than the
+            difficulty criteria become IoU-matched ignores, detections shorter than the
             level's minimum height are discarded, AP uses class-specific IoU
             (Car 0.7, Pedestrian/Cyclist 0.5) and 40 recall points (AP|R40), the
             metric the official benchmark has reported since 2019.
+            Dropping short detections gives the same AP as the devkit, which keeps
+            them as ignored detections: a GT they would have matched still counts
+            as a positive there and is then missed, so precision/recall agree.
 """
 
 from __future__ import annotations
@@ -27,6 +31,21 @@ from det_eval.data import DIFFICULTY, KITTI_CAT_ID
 STAT_NAMES = ["AP", "AP50", "AP75", "APs", "APm", "APl", "AR1", "AR10", "AR100", "ARs", "ARm", "ARl"]
 KITTI_IOU = {"Car": 0.7, "Pedestrian": 0.5, "Cyclist": 0.5}
 LEVEL_ORDER = ["easy", "moderate", "hard"]
+
+
+class KittiEval(COCOeval):
+    """COCOeval that also ignores ``kitti_ignore`` ground truth.
+
+    pycocotools' ``_prepare`` overwrites ``gt['ignore']`` with ``iscrowd``; we re-apply the
+    KITTI flag afterwards. Non-crowd ignored GT is matched by IoU, absorbs at most one
+    detection, and that detection is ignored -- the devkit's neighbour / difficulty rule.
+    """
+
+    def _prepare(self):
+        super()._prepare()
+        for gts in self._gts.values():
+            for g in gts:
+                g["ignore"] = int(bool(g["iscrowd"]) or bool(g.get("kitti_ignore", 0)))
 
 
 def coco_from_dict(d: dict) -> COCO:
@@ -55,9 +74,9 @@ def _per_class_ap(E: COCOeval, cat_names: dict[int, str], iou: float | None = No
     return out
 
 
-def coco_eval(gt_dict: dict, dets: list[dict]) -> dict:
+def coco_eval(gt_dict: dict, dets: list[dict], evaluator=COCOeval) -> dict:
     gt = coco_from_dict(gt_dict)
-    E = COCOeval(gt, _load_res(gt, dets), "bbox")
+    E = evaluator(gt, _load_res(gt, dets), "bbox")
     with contextlib.redirect_stdout(io.StringIO()):
         E.evaluate()
         E.accumulate()
@@ -78,8 +97,8 @@ def kitti_level_gt(gt_dict: dict, level: str) -> dict:
     allowed = set(LEVEL_ORDER[: LEVEL_ORDER.index(level) + 1])
     g = copy.deepcopy(gt_dict)
     for a in g["annotations"]:
-        if not a["iscrowd"] and a["kitti_difficulty"] not in allowed:
-            a["iscrowd"] = 1
+        if not a["kitti_ignore"] and a["kitti_difficulty"] not in allowed:
+            a["kitti_ignore"] = 1
             a["ignore_reason"] = f"difficulty>{level}"
     return g
 
@@ -88,7 +107,7 @@ def kitti_level_eval(gt_dict: dict, dets: list[dict], level: str) -> dict:
     min_h = DIFFICULTY[level]["min_height"]
     gt = coco_from_dict(kitti_level_gt(gt_dict, level))
     dets = [d for d in dets if d["bbox"][3] >= min_h]
-    E = COCOeval(gt, _load_res(gt, dets), "bbox")
+    E = KittiEval(gt, _load_res(gt, dets), "bbox")
     E.params.iouThrs = np.array([0.5, 0.7])
     E.params.recThrs = np.linspace(1 / 40, 1.0, 40)  # AP|R40
     E.params.areaRng = [[0, 1e10]]
@@ -106,6 +125,6 @@ def kitti_level_eval(gt_dict: dict, dets: list[dict], level: str) -> dict:
 
 
 def kitti_eval(gt_dict: dict, dets: list[dict]) -> dict:
-    res = dict(coco_style=coco_eval(gt_dict, dets))
+    res = dict(coco_style=coco_eval(gt_dict, dets, KittiEval))
     res["kitti_R40"] = {lvl: kitti_level_eval(gt_dict, dets, lvl) for lvl in LEVEL_ORDER}
     return res

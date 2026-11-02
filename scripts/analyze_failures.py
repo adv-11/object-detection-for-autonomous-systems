@@ -9,12 +9,13 @@ For each run (mapped to KITTI classes with the run's default mapping):
    (max recall) and (b) detections at the operating threshold of 0.3.
 2. False-positive taxonomy at the operating threshold (TIDE-style, simplified), using
    the *full* KITTI label set (incl. Van/Truck/Tram/Misc/DontCare):
-     ignored    overlaps DontCare / neighbour class (not penalised by the metric)
+     ignored    DontCare (IoA >= class IoU) or neighbour class (IoU >= class IoU); not penalised
      duplicate  matches a GT already claimed by a higher-scoring detection
      localization  same-class GT with 0.1 <= IoU < class threshold
      confusion  IoU >= 0.5 with a GT of another KITTI class (e.g. Car on Truck)
      background everything else
-3. IoU distribution of Car detections matched at IoU >= 0.5 (box-convention shift).
+3. IoU distribution of Car detections matched greedily at IoU >= 0.5 (how many true
+   detections the 0.7 Car threshold rejects).
 
 Writes results/failures/<run>.json and qualitative examples to results/failures/img/.
 """
@@ -28,7 +29,8 @@ import json
 import numpy as np
 
 from det_eval.data import KITTI_CAT_ID, ROOT, parse_kitti_label, read_split
-from det_eval.mapping import coco_to_kitti, prompts_to_kitti
+from det_eval.detectors import MAX_DET
+from det_eval.mapping import cap, coco_to_kitti, prompts_to_kitti
 from det_eval.metrics import KITTI_IOU
 
 RAW = ROOT / "results" / "raw"
@@ -72,7 +74,8 @@ def load_mapped(run):
             r = rows[rows[:, 0] == img_id]
             names = [vocab[int(l)] for l in r[:, 6]]
             b, s = r[:, 1:5].astype(np.float32), r[:, 5].astype(np.float32)
-            by_img[img_id] = coco_to_kitti(b, s, names, "fused") if "person" in vocab else prompts_to_kitti(b, s, names)
+            mapped = coco_to_kitti(b, s, names, "fused") if "person" in vocab else prompts_to_kitti(b, s, names)
+            by_img[img_id] = cap(*mapped, MAX_DET)
     return raw["meta"], by_img
 
 
@@ -105,7 +108,8 @@ def analyze(run):
             # --- greedy matching at operating threshold, FP taxonomy
             op_idx = [k for k in range(len(sel)) if ds[sel[k]] >= OP_THRESH]
             claimed = set()
-            ign = np.nonzero(np.isin(gt_cls, list(NEIGHBOUR[cls] | {"DontCare"})))[0]
+            dontcare = np.nonzero(gt_cls == "DontCare")[0]
+            neigh = np.nonzero(np.isin(gt_cls, list(NEIGHBOUR[cls])))[0]
             other = np.nonzero(np.isin(gt_cls, [c for c in ("Car", "Van", "Truck", "Pedestrian", "Person_sitting", "Cyclist", "Tram", "Misc") if c != cls]))[0]
             for k in op_idx:
                 row = iou[k]
@@ -114,13 +118,12 @@ def analyze(run):
                 if free:
                     g = max(free, key=lambda g: row[g])
                     claimed.add(g)
-                    if cls == "Car":
-                        car_ious.append(float(row[g]))
                     continue
-                if cand:
-                    kind = "duplicate"
-                elif len(ign) and ioa_det(db[sel[k]][None], gt_box[ign]).max() >= 0.5:
+                # same order and overlap rules as the metric: DontCare by IoA, neighbours by IoU
+                if (len(dontcare) and ioa_det(db[sel[k]][None], gt_box[dontcare]).max() >= thr) or                         (len(neigh) and row[neigh].max() >= thr):
                     kind = "ignored"
+                elif cand:
+                    kind = "duplicate"
                 elif len(gi) and row[gi].max() >= 0.1:
                     kind = "localization"
                 elif len(other) and row[other].max() >= 0.5:
@@ -130,6 +133,14 @@ def analyze(run):
                 fp_counts[cls][kind] = fp_counts[cls].get(kind, 0) + 1
                 img_fp += kind != "ignored"
             img_missed += sum(1 for g in gi if g not in claimed)
+            if cls == "Car":  # separate greedy pass at IoU 0.5 for the localisation-quality histogram
+                claimed50 = set()
+                for k in op_idx:
+                    free50 = [g for g in gi if iou[k, g] >= 0.5 and g not in claimed50]
+                    if free50:
+                        g = max(free50, key=lambda g: iou[k, g])
+                        claimed50.add(g)
+                        car_ious.append(float(iou[k, g]))
         examples.append((img_id, img_fp, img_missed))
 
     rec = recall_rows

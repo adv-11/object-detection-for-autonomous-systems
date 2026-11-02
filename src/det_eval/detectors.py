@@ -7,13 +7,19 @@ indexing ``detector.class_names``. Mapping labels to a dataset taxonomy happens 
 without rerunning inference.
 
 Shared protocol (applied identically to every model):
-* score threshold 0.001 and at most 100 detections per image, the COCO evaluation budget;
-* each model keeps its own native NMS IoU (or none for set-prediction DETRs);
-* FP32 inference for accuracy runs (FP16 is measured separately in the speed benchmark).
+* score threshold 0.001; up to ``MAX_RAW`` = 300 raw detections are kept per image and the
+  COCO budget of 100 detections per image is applied *after* mapping to the evaluation
+  taxonomy (scripts/evaluate.py), so 80-class models are not handicapped on 3-class KITTI;
+* multi-label NMS for every NMS-based model (a box may carry several classes, as in
+  torchvision's per-class NMS and Ultralytics' own validator); each model keeps its native
+  NMS IoU, set-prediction DETRs use none;
+* FP32 weights for accuracy runs (cuDNN's default TF32 convolutions stay enabled); FP16 is
+  measured separately in the speed benchmark.
 """
 
 from __future__ import annotations
 
+import functools
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -23,7 +29,8 @@ from det_eval.data import ROOT
 
 WEIGHTS = ROOT / "weights"
 SCORE_THRESH = 0.001
-MAX_DET = 100
+MAX_RAW = 300  # raw detections saved per image
+MAX_DET = 100  # evaluation budget per image, applied after taxonomy mapping
 
 
 @dataclass
@@ -32,7 +39,7 @@ class Detections:
     scores: np.ndarray  # (N,)
     labels: np.ndarray  # (N,) int, indexes Detector.class_names
 
-    def topk(self, k: int = MAX_DET) -> "Detections":
+    def topk(self, k: int = MAX_RAW) -> "Detections":
         order = np.argsort(-self.scores, kind="stable")[:k]
         return Detections(self.boxes[order], self.scores[order], self.labels[order])
 
@@ -64,7 +71,9 @@ class Detector:
             input=self.input_desc,
             nms_iou=self.nms_iou,
             score_thresh=SCORE_THRESH,
-            max_det=MAX_DET,
+            max_raw_det=MAX_RAW,
+            max_eval_det=MAX_DET,
+            nms_multi_label=self.nms_iou is not None,
             precision="fp16" if self.half else "fp32",
             open_vocab=self.open_vocab,
         )
@@ -85,7 +94,8 @@ class UltralyticsDetector(Detector):
             family=family,
             checkpoint=checkpoint,
             framework="ultralytics",
-            input_desc=f"letterbox, long side {imgsz}, stride-padded (rect)",
+            input_desc=(f"stretch to {imgsz}x{imgsz} (no aspect preservation)" if "rtdetr" in checkpoint
+                        else f"letterbox, long side {imgsz}, stride-padded (rect)"),
             nms_iou=nms,
             class_names=[self.model.names[i] for i in range(len(self.model.names))],
             open_vocab=open_vocab,
@@ -99,15 +109,17 @@ class UltralyticsDetector(Detector):
         self.class_names = list(names)
 
     def predict(self, img):
-        # Ultralytics expects BGR numpy arrays.
+        # Ultralytics expects BGR numpy arrays; RT-DETR keeps its own NMS-free predictor.
+        extra = {} if self.nms_iou is None else {"predictor": _multilabel_predictor()}
         r = self.model.predict(
-            img[:, :, ::-1],
+            np.ascontiguousarray(img[:, :, ::-1]),
             imgsz=self.imgsz,
             conf=SCORE_THRESH,
             iou=self.nms_iou or 0.7,
-            max_det=300,
+            max_det=MAX_RAW,
             quantize=16 if self.half else None,  # None -> FP32 for PyTorch weights
             verbose=False,
+            **extra,
         )[0]
         b = r.boxes
         return Detections(
@@ -115,6 +127,27 @@ class UltralyticsDetector(Detector):
             b.conf.cpu().numpy().astype(np.float32),
             b.cls.cpu().numpy().astype(np.int64),
         ).topk()
+
+
+@functools.cache  # one class object, so Ultralytics reuses its predictor between calls
+def _multilabel_predictor():
+    """DetectionPredictor whose NMS keeps several labels per box (as Ultralytics' validator does)."""
+    from ultralytics.models.yolo.detect import DetectionPredictor
+    from ultralytics.utils import nms
+
+    class MultiLabelPredictor(DetectionPredictor):
+        def postprocess(self, preds, img, orig_imgs, **kwargs):
+            preds = nms.non_max_suppression(
+                preds, self.args.conf, kwargs.pop("iou", self.args.iou), self.args.classes, self.args.agnostic_nms,
+                multi_label=True, max_det=self.args.max_det, nc=0,
+                end2end=getattr(self.model, "end2end", False),
+            )
+            if not isinstance(orig_imgs, list):
+                from ultralytics.utils import ops
+                orig_imgs = ops.convert_torch2numpy_batch(orig_imgs)[..., ::-1]
+            return self.construct_results(preds, img, orig_imgs, **kwargs)
+
+    return MultiLabelPredictor
 
 
 # --------------------------------------------------------------------------- torchvision
@@ -128,13 +161,14 @@ class TorchvisionDetector(Detector):
             "fcos_resnet50_fpn": (tvd.fcos_resnet50_fpn, tvd.FCOS_ResNet50_FPN_Weights.COCO_V1, 0.6),
         }
         build, weights, nms = builders[arch]
-        kwargs = dict(detections_per_img=MAX_DET)
-        if arch.startswith("fasterrcnn"):
-            kwargs["box_score_thresh"] = SCORE_THRESH
+        if arch.startswith("fasterrcnn"):  # RoI-head kwargs; unknown names are silently swallowed
+            kwargs = dict(box_score_thresh=SCORE_THRESH, box_detections_per_img=MAX_RAW)
         else:
-            kwargs["score_thresh"] = SCORE_THRESH
+            kwargs = dict(score_thresh=SCORE_THRESH, detections_per_img=MAX_RAW)
         torch.hub.set_dir(str(WEIGHTS / "torch_hub"))
         self.model = build(weights=weights, **kwargs).eval().cuda()
+        head = getattr(self.model, "roi_heads", self.model)
+        assert head.detections_per_img == MAX_RAW and head.score_thresh == SCORE_THRESH
         self.dtype = torch.float16 if half else torch.float32
         super().__init__(
             name=name,

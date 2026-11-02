@@ -3,9 +3,14 @@
     uv run python scripts/finetune_yolo.py --model yolo11m.pt --imgsz 1280 --epochs 30 --batch 8
 
 Protocol notes
-* Training uses only the KITTI *train* split (Chen et al.); validation during training is
-  disabled so KITTI val is never used for checkpoint or hyper-parameter selection. The
-  final-epoch weights (last.pt) are evaluated exactly once with scripts/run_inference.py.
+* Training uses only the KITTI *train* split (Chen et al.). Per-epoch validation is off and
+  the one validation Ultralytics always runs after the final epoch uses 300 *training*
+  images (kitti_finetune.yaml), so KITTI val is never seen during training or used for
+  checkpoint / hyper-parameter selection. The final-epoch weights (last.pt) are evaluated
+  exactly once on KITTI val with scripts/run_inference.py.
+* Single seed; with CUDA, ``deterministic=True`` only warns on non-deterministic kernels,
+  so reruns are close but not bit-identical.
+* DontCare regions are treated as background during training (no ignore masking).
 * 7 training classes (Car, Van, Truck, Pedestrian, Person_sitting, Cyclist, Tram);
   DontCare and Misc boxes are dropped. Evaluation still scores only Car/Pedestrian/Cyclist.
 * All other hyper-parameters are Ultralytics defaults (SGD/AdamW auto, mosaic, flips,
@@ -39,7 +44,7 @@ def main():
     model = cls(str(WEIGHTS / args.model))
     t0 = time.time()
     model.train(
-        data=str(DATA / "kitti_yolo" / "kitti.yaml"),
+        data=str(DATA / "kitti_yolo" / "kitti_finetune.yaml"),
         imgsz=args.imgsz,
         epochs=args.epochs,
         batch=args.batch,

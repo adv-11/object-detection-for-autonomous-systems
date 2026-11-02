@@ -25,4 +25,4 @@ for v in coco kitti kittidesc; do                                   # open-vocab
   run --model yolo_world_l --dataset kitti --imgsz 1280 --vocab "$v"
   run --model grounding_dino_t --dataset kitti --vocab "$v"
 done
-uv run python scripts/evaluate.py | tee -a logs/command_log.txt
+# (evaluation is run by run_all.sh)

@@ -4,7 +4,8 @@
 
 For each detector and input domain, the same 100 real images are pushed through the
 full ``predict()`` path (pre-processing, network, NMS / decoding, post-processing) after
-20 warm-up iterations. CUDA is synchronised around every call. Image decoding is
+one complete untimed warm-up pass over those images, so cuDNN autotuning for every input
+shape happens before timing. CUDA is synchronised around every call. Image decoding is
 excluded. Peak memory is ``torch.cuda.max_memory_allocated`` (tensors only; the CUDA
 context adds roughly 0.3-0.5 GB on top). Results: results/speed/speed.json
 """
@@ -38,7 +39,7 @@ CONFIGS = [  # (model key, build kwargs, domains)
     ("yolo_world_l", {"imgsz": 1280}, ["kitti"]),
     ("grounding_dino_t", {}, ["coco", "kitti"]),
 ]
-N_IMAGES, WARMUP = 100, 20
+N_IMAGES = 100
 
 
 def images(domain):
@@ -61,8 +62,8 @@ def gpu_state():
 
 
 def bench(det, imgs):
-    for i in range(WARMUP):
-        det.predict(imgs[i % len(imgs)])
+    for img in imgs:  # full warm-up pass (all input shapes autotuned)
+        det.predict(img)
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
     lat = []
@@ -101,7 +102,7 @@ def main():
     out = ROOT / "results" / "speed"
     out.mkdir(parents=True, exist_ok=True)
     meta = dict(gpu=torch.cuda.get_device_name(0), nvidia_smi=gpu_state(), torch=torch.__version__,
-                n_images=N_IMAGES, warmup=WARMUP, batch=1)
+                n_images=N_IMAGES, warmup="1 full pass", batch=1, cudnn_benchmark=True)
     (out / "speed.json").write_text(json.dumps(dict(meta=meta, rows=rows), indent=1))
 
 

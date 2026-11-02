@@ -11,6 +11,7 @@ detections [image_id, x1, y1, x2, y2, score, label], wall-clock timing and peak 
 from __future__ import annotations
 
 import argparse
+import collections
 import gzip
 import json
 import platform
@@ -29,6 +30,7 @@ from det_eval.data import COCO_IMAGES, ROOT, coco_image_records, kitti_image_pat
 from det_eval.mapping import COCO_NAMES, VOCABULARIES
 
 RAW = ROOT / "results" / "raw"
+PREFETCH = 8
 
 
 def image_list(dataset: str, limit: int | None):
@@ -70,6 +72,7 @@ def main():
     ap.add_argument("--weights", default=None, help="override checkpoint path (fine-tuned models)")
     ap.add_argument("--tag", default=None, help="run name suffix")
     ap.add_argument("--limit", type=int, default=None, help="debug: only the first N images")
+    ap.add_argument("--overwrite", action="store_true", help="replace an existing raw file")
     args = ap.parse_args()
 
     kwargs = {}
@@ -77,7 +80,8 @@ def main():
         kwargs["imgsz"] = args.imgsz
     det = detectors.build(args.model, **kwargs)
     if args.weights:
-        det = detectors.UltralyticsDetector(det.name.split("@")[0] + " (KITTI-FT)", det.family, args.weights, det.imgsz)
+        det = detectors.UltralyticsDetector(det.name + " KITTI-FT", det.family, args.weights, det.imgsz)
+        args.tag = args.tag or "ft"  # never collide with the zero-shot run of the same model
     if det.open_vocab:
         det.set_vocabulary(VOCABULARIES[args.vocab])
     elif args.vocab != "coco":
@@ -86,6 +90,8 @@ def main():
     run = args.model + (f"_{args.imgsz}" if args.imgsz else "") + (f"_v{args.vocab}" if det.open_vocab else "")
     run = f"{args.dataset}__{run}" + (f"_{args.tag}" if args.tag else "")
     items = image_list(args.dataset, args.limit)
+    if (RAW / f"{run}.json.gz").exists() and not args.overwrite:
+        sys.exit(f"{run} already exists; pass --overwrite to replace it")
 
     # Warm up kernels / cudnn autotuning outside the timed loop.
     for _ in range(3):
@@ -96,7 +102,11 @@ def main():
     rows, model_ms = [], []
     t_start = time.perf_counter()
     with ThreadPoolExecutor(4) as pool:
-        for (img_id, _), img in tqdm(zip(items, pool.map(load, [p for _, p in items])), total=len(items), desc=run, mininterval=20):
+        pending = collections.deque(pool.submit(load, p) for _, p in items[:PREFETCH])  # bounded prefetch
+        for i, (img_id, _) in enumerate(tqdm(items, desc=run, mininterval=20)):
+            img = pending.popleft().result()
+            if i + PREFETCH < len(items):
+                pending.append(pool.submit(load, items[i + PREFETCH][1]))
             t0 = time.perf_counter()
             d = det.predict(img)
             torch.cuda.synchronize()
@@ -112,6 +122,9 @@ def main():
         num_images=len(items),
         image_ids=[i for i, _ in items],
         detector=det.config(),
+        vocab_key=args.vocab if det.open_vocab else ("kitti-ft" if args.weights else "coco"),
+        weights=args.weights,
+        tag=args.tag,
         vocabulary=det.class_names,
         timing=dict(
             wall_s=round(wall, 1),

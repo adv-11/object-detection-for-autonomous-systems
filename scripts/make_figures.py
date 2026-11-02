@@ -42,12 +42,12 @@ def fig_speed_accuracy():
             if m.empty:
                 continue
             g = plotstyle.group_of(r.family)
-            ax.scatter(m.ms_mean.iloc[0], r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white",
+            ax.scatter(m.ms_p50.iloc[0], r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white",
                        linewidth=1.5, zorder=3, label=g)
-            ax.annotate(short(r.model).replace("@640", ""), (m.ms_mean.iloc[0], r.AP), xytext=(5, -3),
+            ax.annotate(short(r.model).replace("@640", ""), (m.ms_p50.iloc[0], r.AP), xytext=(5, -3),
                         textcoords="offset points", fontsize=6.8, color=plotstyle.TEXT)
         ax.set_xscale("log")
-        ax.set_xlabel(f"latency per image, batch 1, {prec.upper()} (ms, log)")
+        ax.set_xlabel(f"median latency per image, batch 1, {prec.upper()} (ms, log)")
         ax.set_title(f"COCO val2017 — {prec.upper()}", loc="left")
     axes[0].set_ylabel("COCO AP@[.50:.95]")
     h, l = axes[0].get_legend_handles_labels()
@@ -197,38 +197,27 @@ def fig_fp_taxonomy(runs_labels):
 
 
 # ----------------------------------------------------------------------------- 6. fine-tuning
-def fig_finetune(pairs):
-    rows = []
-    for zs, ft, lab in pairs:
-        a, b = metrics(zs), metrics(ft)
-        if not (a and b):
-            continue
-        ka = a["metrics"]["fused"]["kitti_R40"]["moderate"]
-        kb = b["metrics"]["prompt"]["kitti_R40"]["moderate"]
-        for c in ("Car", "Pedestrian", "Cyclist", "mAP"):
-            rows.append(dict(model=lab, cls=c, zero_shot=ka[c], finetuned=kb[c]))
-    if not rows:
+def fig_finetune(zs_run, ft_runs):
+    """Zero-shot vs fine-tuned (several label budgets), KITTI moderate AP|R40 per class."""
+    series = [("COCO-pretrained, zero-shot", metrics(zs_run), "fused")]
+    series += [(f"fine-tuned, {lab}", metrics(r), "prompt") for r, lab in ft_runs]
+    series = [(lab, m, k) for lab, m, k in series if m]
+    if len(series) < 2:
         return
-    df = pd.DataFrame(rows)
-    fig, ax = plt.subplots(figsize=(5.2, 2.5))
     cats = ["Car", "Pedestrian", "Cyclist", "mAP"]
     x = np.arange(len(cats))
-    models = list(dict.fromkeys(df.model))
-    w = 0.8 / (2 * len(models))
-    i = 0
-    for m in models:
-        d = df[df.model == m].set_index("cls").loc[cats]
-        for col, color, tag in (("zero_shot", S[0], "COCO-pretrained, zero-shot"), ("finetuned", S[1], "fine-tuned on KITTI train")):
-            bars = ax.bar(x - 0.4 + w * (i + 0.5), d[col], width=w * 0.92, color=color,
-                          label=f"{m}: {tag}" if len(models) > 1 else tag)
-            for b_, v in zip(bars, d[col]):
-                ax.text(b_.get_x() + b_.get_width() / 2, v + 1, f"{v:.0f}", ha="center", fontsize=6.5)
-            i += 1
+    w = 0.8 / len(series)
+    fig, ax = plt.subplots(figsize=(5.6, 2.6))
+    for i, (lab, m, key) in enumerate(series):
+        vals = [m["metrics"][key]["kitti_R40"]["moderate"][c] for c in cats]
+        bars = ax.bar(x - 0.4 + w * (i + 0.5), vals, width=w * 0.9, color=S[i], label=lab)
+        for b_, v in zip(bars, vals):
+            ax.text(b_.get_x() + b_.get_width() / 2, v + 1, f"{v:.0f}", ha="center", fontsize=6.5, color=plotstyle.TEXT)
     ax.set_xticks(x, cats)
-    ax.set_ylabel("KITTI moderate AP|R40")
-    ax.set_ylim(0, 105)
+    ax.set_ylabel("KITTI val, moderate AP|R40")
+    ax.set_ylim(0, 108)
     ax.grid(axis="x", visible=False)
-    ax.legend(fontsize=7, loc="upper right", ncol=1)
+    ax.legend(fontsize=7, loc="upper center", ncol=len(series), bbox_to_anchor=(0.5, 1.16))
     fig.savefig(FIG / "fig_finetune.png")
 
 
@@ -238,12 +227,13 @@ def main():
     fig_domain_shift()
     fig_resolution()
     analysed = [("kitti__faster_rcnn_r50_v2", "Faster R-CNN (zero-shot)"),
-                ("kitti__yolo11m_1280", "YOLO11m@1280 (zero-shot)"),
                 ("kitti__rtdetr_l_1280", "RT-DETR-L@1280 (zero-shot)"),
-                ("kitti__yolo11m_1280_ft", "YOLO11m@1280 (fine-tuned)")]
+                ("kitti__yolo11s_1280", "YOLO11s@1280 (zero-shot)"),
+                ("kitti__yolo11s_1280_ft", "YOLO11s@1280 (fine-tuned)")]
     fig_recall_height(analysed)
     fig_fp_taxonomy(analysed)
-    fig_finetune([("kitti__yolo11m_1280", "kitti__yolo11m_1280_ft", "YOLO11m@1280")])
+    fig_finetune("kitti__yolo11s_1280", [("kitti__yolo11s_1280_ft25", "25% of train"),
+                                         ("kitti__yolo11s_1280_ft", "100% of train")])
     print("figures:", sorted(p.name for p in FIG.glob("*.png")))
 
 

@@ -29,7 +29,8 @@ def coco_table(runs):
                          ms_per_img=t["model_ms_median"], peak_mem_mb=r["meta"]["peak_mem_mb"],
                          AP_person=m["per_class_AP"]["person"], AP_car=m["per_class_AP"]["car"],
                          AP_bicycle=m["per_class_AP"]["bicycle"]))
-    return pd.DataFrame(rows).sort_values("AP", ascending=False)
+    df = pd.DataFrame(rows)
+    return df.sort_values("AP", ascending=False) if not df.empty else df
 
 
 def kitti_table(runs):
@@ -38,7 +39,7 @@ def kitti_table(runs):
         if r["meta"]["dataset"] != "kitti":
             continue
         d, voc = r["meta"]["detector"], r["meta"]["run"]
-        vocab = voc.split("_v")[-1] if d["open_vocab"] else "coco"
+        vocab = r["meta"].get("vocab_key", "coco")
         for strat, m in r["metrics"].items():
             s, k = m["coco_style"]["summary"], m["kitti_R40"]
             rows.append(dict(
