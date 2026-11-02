@@ -24,7 +24,7 @@ adversarial review of the evaluation code found and fixed an ignore-rule bug bef
 
 Detectors are trained and ranked on COCO [1], yet an autonomous vehicle sees a different world: wide 1242×375 frames, objects at
 distance, heavy occlusion, and a label taxonomy (Car / Pedestrian / Cyclist) that does not match COCO's 80 classes. This report asks
-whether published COCO accuracy predicts behaviour on a driving benchmark, KITTI [2], when the detector is **not retrained**, and
+whether published COCO accuracy predicts behaviour on a driving benchmark, KITTI [2], when the detector is **not retrained** (dataset shift is a known failure mode of driving perception [24]), and
 what it takes to close the gap. We evaluate **eight model configurations from six detector families** — two-stage CNN, one-stage
 anchor-based, one-stage anchor-free, real-time YOLO, real-time DETR and open-vocabulary detectors — under one shared protocol, and
 answer four questions:
@@ -45,7 +45,7 @@ All checkpoints are the official COCO-trained weights (Table 1 lists the reprodu
 with FPN [4] is the two-stage reference; we use torchvision's improved "v2" recipe [5]. **RetinaNet** [6] (v2 weights trained with
 the ATSS recipe [7]) and **FCOS** [8] represent one-stage dense detectors, anchor-based and anchor-free. **YOLO11** [9], [10]
 (s and m) is the current Ultralytics real-time CNN, a descendant of YOLO [11]. **RT-DETR-L** [12] is a real-time member of the
-DETR family [13], [14]: set prediction with no NMS. **YOLO-World-L v2** [15] and **Grounding DINO-T** [16] are open-vocabulary
+DETR family [13], [14]: set prediction with no NMS. **YOLO-World-L v2** [15] and **Grounding DINO-T** [16] (Hugging Face port [25]) are open-vocabulary
 detectors that score boxes against text prompts; neither was trained on COCO annotations, so their COCO numbers are
 "zero-shot", with the caveat that their grounding data (GoldG) shares images with COCO's sources [15], [16].
 
@@ -148,7 +148,7 @@ power-limited laptop GPU the YOLO models are 2.5–4× and RT-DETR-L 1.3–1.8×
 ~0.46 s per image, 15× YOLO11m (Figure 1). Absolute latencies are FP32 eager-PyTorch numbers including Python pre/post-processing
 and are not comparable to the TensorRT FP16 figures in the papers.
 
-<figure><img src="../figures/fig_speed_accuracy.png" style="width:62%"><figcaption>Figure 1. Speed–accuracy on COCO val2017 (batch 1, FP32, 45 W laptop GPU).</figcaption></figure>
+<figure><img src="../figures/fig_speed_accuracy.png" style="width:54%"><figcaption>Figure 1. Speed–accuracy on COCO val2017 (batch 1, FP32, 45 W laptop GPU).</figcaption></figure>
 
 ## 4.2 KITTI val without retraining (cross-domain)
 
@@ -165,7 +165,7 @@ remain below what 8 minutes of fine-tuning achieves with a smaller model at a sm
 
 ## 5.1 Cross-dataset generalization: which classes and scales degrade?
 
-<figure><img src="../figures/fig_domain_shift_per_class.png" style="width:86%"><figcaption>Figure 2. Per-class AP@[.50:.95] on COCO val2017
+<figure><img src="../figures/fig_domain_shift_per_class.png" style="width:76%"><figcaption>Figure 2. Per-class AP@[.50:.95] on COCO val2017
 (blue) and zero-shot on KITTI val (orange). Ultralytics models use 640 px on both datasets; YOLO-World uses 1280 px on KITTI.</figcaption></figure>
 
 **Car transfers; people do not.** COCO-trained detectors find KITTI cars about as well as COCO cars: Faster R-CNN scores 49.9 AP on
@@ -185,7 +185,7 @@ while Car changes little (73.2 → 74.4) because cars are large enough at either
 small objects (APl 67 → APs 33 for YOLO11m); on KITTI APl is only 36–40 for every model, because "large" KITTI objects are mostly near,
 truncated cars at the image border, whose boxes COCO models localise poorly at IoU ≥ 0.75.
 
-<figure><img src="../figures/fig_scale_distribution.png" style="width:82%"><figcaption>Figure 3. Box heights at native resolution for the
+<figure><img src="../figures/fig_scale_distribution.png" style="width:72%"><figcaption>Figure 3. Box heights at native resolution for the
 three shared classes. KITTI objects are not smaller than COCO's in pixels; downsampling the 1242-px-wide frame to 640 px halves them.</figcaption></figure>
 
 **Difficulty.** Moderate → Hard costs every zero-shot model 7–9 mAP points (e.g. YOLO11m@1280: 73.3 / 65.3 / 56.1 for Easy / Moderate /
@@ -249,7 +249,7 @@ at 1280 px did not fit and the fine-tune had to use YOLO11s.
 
 ## 5.6 Fine-tuning: zero-shot vs. adapted
 
-<figure><img src="../figures/fig_finetune.png" style="width:56%"><figcaption>Figure 4. YOLO11s at 640 px: COCO weights zero-shot vs. after
+<figure><img src="../figures/fig_finetune.png" style="width:50%"><figcaption>Figure 4. YOLO11s at 640 px: COCO weights zero-shot vs. after
 5 epochs (8 minutes) of fine-tuning on KITTI train. KITTI val Moderate AP|R40.</figcaption></figure>
 
 Five epochs on KITTI train (3,712 images, 8 minutes, 4.1 GB) lift YOLO11s from 25.5 to 38.2 COCO-style AP and from 52.1 to 65.8 Moderate
@@ -266,7 +266,7 @@ minutes of in-domain fine-tuning are worth more than a larger model or a larger 
 <p class="tcap">Table 6. Recall (all detections, class IoU threshold) by ground-truth box height (px) and occlusion level, and share of
 matched Car detections (score ≥ 0.3, IoU ≥ 0.5) whose IoU is below 0.7.</p>
 
-<figure><img src="../figures/fig_fp_taxonomy.png" style="width:88%"><figcaption>Figure 5. False positives at score ≥ 0.3, classified
+<figure><img src="../figures/fig_fp_taxonomy.png" style="width:70%"><figcaption>Figure 5. False positives at score ≥ 0.3, classified
 TIDE-style [23] against the full KITTI label set: localisation (same-class GT with 0.1 ≤ IoU < threshold), confusion (IoU ≥ 0.5 with a GT of
 another class), duplicate, background. Detections absorbed by ignore regions are excluded.</figcaption></figure>
 
@@ -283,7 +283,7 @@ gap; after fine-tuning the dominant Cyclist error flips to the opposite confusio
 Background false positives (poles, signs, shop fronts detected as people) are several times more frequent for Faster R-CNN than for
 YOLO11 at the same 0.3 operating point, reflecting different score calibration rather than worse ranking.
 
-<figure><img src="../figures/fig_qualitative.png" style="width:92%"><figcaption>Figure 6. KITTI val examples (score ≥ 0.3). Blue: Car,
+<figure><img src="../figures/fig_qualitative.png" style="width:80%"><figcaption>Figure 6. KITTI val examples (score ≥ 0.3). Blue: Car,
 orange: Pedestrian, aqua: Cyclist; grey dotted: ignore regions. Left to right: ground truth, YOLO11s@640 zero-shot, fine-tuned. Zero-shot misses the distant cyclist (row 1) or calls it a pedestrian
 (row 3) and misses far, small cars; the fine-tuned model recovers both, but still splits the occluded pedestrian at the left edge of row 2.</figcaption></figure>
 
