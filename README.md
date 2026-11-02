@@ -16,7 +16,7 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 | Grounding DINO-T | 48.3 / 48.4 | see report |
 | Faster R-CNN R50-FPN v2 | 46.9 / 46.7 | 58.8 |
 | YOLO11s | 46.1 / 47.0 | 52.1 (640) → **65.8 after 5-epoch fine-tune** |
-| YOLO-World-L v2 | 45.1 / 45.1 | see report |
+| YOLO-World-L v2 | 45.1 / 45.1 | **70.9 (1280, best zero-shot)** · 46.4 with KITTI-name prompts |
 | RetinaNet R50-FPN v2 | 41.4 / 41.5 | – |
 | FCOS R50-FPN | 39.2 / 39.2 | – |
 
@@ -24,6 +24,7 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
   two-thirds of their AP to taxonomy, box-convention and resize effects.
 * Keeping KITTI's 1242-px frames at 1280 px instead of 640 adds 7.6 Moderate mAP to YOLO11m without retraining.
 * Mapping COCO `bicycle` to KITTI Cyclist naively gives 0.4 AP; fusing rider and bike gives up to 51.
+* YOLO-World-L, sixth on COCO, is the best zero-shot KITTI detector; prompting it with KITTI class names instead of COCO names is much worse.
 * 5 epochs (8 min) of fine-tuning lift YOLO11s from 52.1 to 65.8 Moderate mAP, mostly by fixing localisation at KITTI's 0.7 Car IoU.
 
 ## Reproduce
