@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 
@@ -39,6 +40,10 @@ def fig_speed_accuracy():
         ax.annotate(short(r.model).replace("@640", ""), (r.ms_per_img, r.AP), xytext=(5, -3),
                     textcoords="offset points", fontsize=6.8, color=plotstyle.TEXT)
     ax.set_xscale("log")
+    ticks = [20, 30, 50, 100, 200, 500]
+    ax.set_xticks(ticks, [str(t) for t in ticks])
+    ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter())
+    ax.set_xlim(20, 700)
     ax.set_xlabel("median latency per image, batch 1, FP32, RTX 5060 Laptop 45 W (ms, log)")
     ax.set_ylabel("COCO val2017 AP@[.50:.95]")
     h, l = ax.get_legend_handles_labels()
@@ -104,6 +109,10 @@ def fig_resolution():
     if not rows:
         return
     df = pd.DataFrame(rows)
+    both = df.groupby("model")["size"].nunique()
+    df = df[df.model.isin(both[both == 2].index)]  # only models run at both input sizes
+    if df.empty:
+        return
     fig, axes = plt.subplots(1, 3, figsize=(7.8, 2.5))
     models = list(dict.fromkeys(df.model))
     x = np.arange(len(models))

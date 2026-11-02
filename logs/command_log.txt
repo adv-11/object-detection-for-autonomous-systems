@@ -44,3 +44,14 @@ coco__yolo_world_l_vcoco already exists; pass --overwrite to replace it
 [2026-11-01 16:58:20] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 640 --epochs 5 --batch 16
 {"wall_s": 86.8, "images_per_s": 43.4, "model_ms_mean": 22.28, "model_ms_median": 19.58, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.2MB dets=613527
 [2026-11-01 17:00:10] uv run python scripts/run_inference.py --model yolo11m --dataset kitti --imgsz 640
+{"wall_s": 138.4, "images_per_s": 27.23, "model_ms_mean": 36.14, "model_ms_median": 37.09, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=143.0MB dets=446537
+[2026-11-01 17:02:51] uv run python scripts/run_inference.py --model yolo11m --dataset kitti --imgsz 1280
+{"wall_s": 172.5, "images_per_s": 21.85, "model_ms_mean": 44.99, "model_ms_median": 53.36, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=212.6MB dets=609811
+[2026-11-01 17:06:10] uv run python scripts/run_inference.py --model rtdetr_l --dataset kitti --imgsz 640
+{"name": "yolo11s_kitti_640_e5_f1", "args": {"model": "yolo11s.pt", "imgsz": 640, "epochs": 5, "batch": 16, "fraction": 1.0, "seed": 0, "name": null}, "train_hours": 0.13, "peak_mem_gb": 4.11, "weights": "runs\\finetune\\yolo11s_kitti_640_e5_f1\\weights\\last.pt"}
+[2026-11-01 17:06:22] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 640 --weights runs/finetune/yolo11s_kitti_640_e5_f1/weights/last.pt --tag ft
+{"wall_s": 84.4, "images_per_s": 44.65, "model_ms_mean": 22.06, "model_ms_median": 21.93, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.1MB dets=230710
+[2026-11-01 17:08:05] FINETUNE DONE
+[2026-11-01 17:08:06] uv run python scripts/run_inference.py --model grounding_dino_t --dataset kitti --vocab kitti
+{"wall_s": 212.8, "images_per_s": 17.71, "model_ms_mean": 55.52, "model_ms_median": 49.22, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=238.6MB dets=1130700
+[2026-11-01 17:10:18] uv run python scripts/run_inference.py --model yolo_world_l --dataset kitti --imgsz 1280 --vocab coco

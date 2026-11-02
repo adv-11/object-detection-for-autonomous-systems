@@ -1,1 +1,5 @@
 [2026-11-01 16:58:20] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 640 --epochs 5 --batch 16
+{"name": "yolo11s_kitti_640_e5_f1", "args": {"model": "yolo11s.pt", "imgsz": 640, "epochs": 5, "batch": 16, "fraction": 1.0, "seed": 0, "name": null}, "train_hours": 0.13, "peak_mem_gb": 4.11, "weights": "runs\\finetune\\yolo11s_kitti_640_e5_f1\\weights\\last.pt"}
+[2026-11-01 17:06:22] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 640 --weights runs/finetune/yolo11s_kitti_640_e5_f1/weights/last.pt --tag ft
+{"wall_s": 84.4, "images_per_s": 44.65, "model_ms_mean": 22.06, "model_ms_median": 21.93, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.1MB dets=230710
+[2026-11-01 17:08:05] FINETUNE DONE
