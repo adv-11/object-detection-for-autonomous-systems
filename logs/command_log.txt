@@ -14,3 +14,22 @@
 {"wall_s": 194.5, "images_per_s": 25.71, "model_ms_mean": 38.22, "model_ms_median": 26.99, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=305.3MB dets=786904
 [2026-11-01 15:43:04] uv run python scripts/run_inference.py --model grounding_dino_t --dataset coco
   image = torch.from_numpy(image)
+===== 2026-11-01 16:02:10 restart after code-review fixes (e96eecc) =====
+[2026-11-01 16:02:10] bash scripts/run_sweep.sh
+[2026-11-01 16:02:10] uv run python scripts/run_inference.py --model faster_rcnn_r50_v2 --dataset coco
+coco__faster_rcnn_r50_v2 already exists; pass --overwrite to replace it
+[2026-11-01 16:02:28] uv run python scripts/run_inference.py --model retinanet_r50_v2 --dataset coco
+coco__retinanet_r50_v2 already exists; pass --overwrite to replace it
+[2026-11-01 16:02:42] uv run python scripts/run_inference.py --model fcos_r50 --dataset coco
+coco__fcos_r50 already exists; pass --overwrite to replace it
+[2026-11-01 16:02:57] uv run python scripts/run_inference.py --model yolo11s --dataset coco
+{"wall_s": 149.1, "images_per_s": 33.53, "model_ms_mean": 28.98, "model_ms_median": 29.15, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.6MB dets=684311
+[2026-11-01 16:06:10] uv run python scripts/run_inference.py --model yolo11m --dataset coco
+{"wall_s": 166.9, "images_per_s": 29.96, "model_ms_mean": 32.67, "model_ms_median": 32.5, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=188.7MB dets=554078
+[2026-11-01 16:09:40] uv run python scripts/run_inference.py --model rtdetr_l --dataset coco
+coco__rtdetr_l already exists; pass --overwrite to replace it
+[2026-11-01 16:09:48] uv run python scripts/run_inference.py --model yolo_world_l --dataset coco
+coco__yolo_world_l_vcoco already exists; pass --overwrite to replace it
+[2026-11-01 16:10:10] uv run python scripts/run_inference.py --model grounding_dino_t --dataset coco
+{"wall_s": 2318.1, "images_per_s": 2.16, "model_ms_mean": 462.04, "model_ms_median": 463.8, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=2284.9MB dets=1500000
+[2026-11-01 16:50:03] uv run python scripts/run_inference.py --model faster_rcnn_r50_v2 --dataset kitti
