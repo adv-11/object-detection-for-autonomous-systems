@@ -1,0 +1,3 @@
+[2026-11-01 16:58:19] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 640
+{"wall_s": 86.8, "images_per_s": 43.4, "model_ms_mean": 22.28, "model_ms_median": 19.58, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.2MB dets=613527
+[2026-11-01 17:00:10] uv run python scripts/run_inference.py --model yolo11m --dataset kitti --imgsz 640

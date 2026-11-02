@@ -29,30 +29,21 @@ def short(name):
 
 # ----------------------------------------------------------------------------- 1. speed vs accuracy
 def fig_speed_accuracy():
-    speed_p = ROOT / "results" / "speed" / "speed.json"
-    if not speed_p.exists():
-        return
-    sp = pd.DataFrame(json.loads(speed_p.read_text())["rows"])
+    """COCO AP vs. median batch-1 FP32 latency (full predict(), measured during the COCO run)."""
     coco = pd.read_csv(ROOT / "results" / "tables" / "coco.csv")
-    fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.0), sharey=True)
-    for ax, prec in zip(axes, ("fp32", "fp16")):
-        s = sp[(sp.domain == "coco") & (sp.precision == prec)]
-        for _, r in coco.iterrows():
-            m = s[s.model == r.model]
-            if m.empty:
-                continue
-            g = plotstyle.group_of(r.family)
-            ax.scatter(m.ms_p50.iloc[0], r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white",
-                       linewidth=1.5, zorder=3, label=g)
-            ax.annotate(short(r.model).replace("@640", ""), (m.ms_p50.iloc[0], r.AP), xytext=(5, -3),
-                        textcoords="offset points", fontsize=6.8, color=plotstyle.TEXT)
-        ax.set_xscale("log")
-        ax.set_xlabel(f"median latency per image, batch 1, {prec.upper()} (ms, log)")
-        ax.set_title(f"COCO val2017 — {prec.upper()}", loc="left")
-    axes[0].set_ylabel("COCO AP@[.50:.95]")
-    h, l = axes[0].get_legend_handles_labels()
+    fig, ax = plt.subplots(figsize=(5.4, 3.0))
+    for _, r in coco.iterrows():
+        g = plotstyle.group_of(r.family)
+        ax.scatter(r.ms_per_img, r.AP, s=46, color=plotstyle.GROUP_COLOR[g], edgecolor="white", linewidth=1.5,
+                   zorder=3, label=g)
+        ax.annotate(short(r.model).replace("@640", ""), (r.ms_per_img, r.AP), xytext=(5, -3),
+                    textcoords="offset points", fontsize=6.8, color=plotstyle.TEXT)
+    ax.set_xscale("log")
+    ax.set_xlabel("median latency per image, batch 1, FP32, RTX 5060 Laptop 45 W (ms, log)")
+    ax.set_ylabel("COCO val2017 AP@[.50:.95]")
+    h, l = ax.get_legend_handles_labels()
     uniq = dict(zip(l, h))
-    fig.legend(uniq.values(), uniq.keys(), loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.07))
+    ax.legend(uniq.values(), uniq.keys(), loc="lower right", fontsize=7)
     fig.savefig(FIG / "fig_speed_accuracy.png")
 
 
@@ -62,10 +53,10 @@ SHIFT_RUNS = [  # (coco run, kitti run, label)
     ("coco__faster_rcnn_r50_v2", "kitti__faster_rcnn_r50_v2", "Faster R-CNN"),
     ("coco__retinanet_r50_v2", "kitti__retinanet_r50_v2", "RetinaNet"),
     ("coco__fcos_r50", "kitti__fcos_r50", "FCOS"),
-    ("coco__yolo11s", "kitti__yolo11s_1280", "YOLO11s"),
-    ("coco__yolo11m", "kitti__yolo11m_1280", "YOLO11m"),
-    ("coco__rtdetr_l", "kitti__rtdetr_l_1280", "RT-DETR-L"),
-    ("coco__yolo_world_l_vcoco", "kitti__yolo_world_l_1280_vcoco", "YOLO-World-L"),
+    ("coco__yolo11s", "kitti__yolo11s_640", "YOLO11s"),
+    ("coco__yolo11m", "kitti__yolo11m_640", "YOLO11m"),
+    ("coco__rtdetr_l", "kitti__rtdetr_l_640", "RT-DETR-L"),
+    ("coco__yolo_world_l_vcoco", "kitti__yolo_world_l_1280_vcoco", "YOLO-World-L (KITTI @1280)"),
     ("coco__grounding_dino_t_vcoco", "kitti__grounding_dino_t_vcoco", "Grounding DINO-T"),
 ]
 
@@ -227,13 +218,12 @@ def main():
     fig_domain_shift()
     fig_resolution()
     analysed = [("kitti__faster_rcnn_r50_v2", "Faster R-CNN (zero-shot)"),
-                ("kitti__rtdetr_l_1280", "RT-DETR-L@1280 (zero-shot)"),
-                ("kitti__yolo11s_1280", "YOLO11s@1280 (zero-shot)"),
-                ("kitti__yolo11s_1280_ft", "YOLO11s@1280 (fine-tuned)")]
+                ("kitti__rtdetr_l_640", "RT-DETR-L@640 (zero-shot)"),
+                ("kitti__yolo11s_640", "YOLO11s@640 (zero-shot)"),
+                ("kitti__yolo11s_640_ft", "YOLO11s@640 (fine-tuned)")]
     fig_recall_height(analysed)
     fig_fp_taxonomy(analysed)
-    fig_finetune("kitti__yolo11s_1280", [("kitti__yolo11s_1280_ft25", "25% of train"),
-                                         ("kitti__yolo11s_1280_ft", "100% of train")])
+    fig_finetune("kitti__yolo11s_640", [("kitti__yolo11s_640_ft", "KITTI train, 5 epochs")])
     print("figures:", sorted(p.name for p in FIG.glob("*.png")))
 
 

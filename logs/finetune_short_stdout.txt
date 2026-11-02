@@ -1,0 +1,1 @@
+[2026-11-01 16:58:20] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 640 --epochs 5 --batch 16

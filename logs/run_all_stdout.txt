@@ -1,0 +1,4 @@
+[2026-11-01 16:02:10] bash scripts/run_sweep.sh
+{"wall_s": 317.4, "images_per_s": 11.87, "model_ms_mean": 82.78, "model_ms_median": 81.16, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=441.1MB dets=713040
+[2026-11-01 16:55:52] uv run python scripts/run_inference.py --model retinanet_r50_v2 --dataset kitti
+  x = torch.from_numpy(np.ascontiguousarray(img)).cuda().permute(2, 0, 1).float().div_(255)

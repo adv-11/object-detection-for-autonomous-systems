@@ -33,3 +33,14 @@ coco__yolo_world_l_vcoco already exists; pass --overwrite to replace it
 [2026-11-01 16:10:10] uv run python scripts/run_inference.py --model grounding_dino_t --dataset coco
 {"wall_s": 2318.1, "images_per_s": 2.16, "model_ms_mean": 462.04, "model_ms_median": 463.8, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=2284.9MB dets=1500000
 [2026-11-01 16:50:03] uv run python scripts/run_inference.py --model faster_rcnn_r50_v2 --dataset kitti
+{"wall_s": 317.4, "images_per_s": 11.87, "model_ms_mean": 82.78, "model_ms_median": 81.16, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=441.1MB dets=713040
+[2026-11-01 16:55:52] uv run python scripts/run_inference.py --model retinanet_r50_v2 --dataset kitti
+  x = torch.from_numpy(np.ascontiguousarray(img)).cuda().permute(2, 0, 1).float().div_(255)
+{"wall_s": 317.4, "images_per_s": 11.87, "model_ms_mean": 82.78, "model_ms_median": 81.16, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=441.1MB dets=713040
+[2026-11-01 16:55:52] uv run python scripts/run_inference.py --model retinanet_r50_v2 --dataset kitti
+  x = torch.from_numpy(np.ascontiguousarray(img)).cuda().permute(2, 0, 1).float().div_(255)
+===== 2026-11-01 16:58:19 scope cut to finish by 18:00 (user request) =====
+[2026-11-01 16:58:19] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 640
+[2026-11-01 16:58:20] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 640 --epochs 5 --batch 16
+{"wall_s": 86.8, "images_per_s": 43.4, "model_ms_mean": 22.28, "model_ms_median": 19.58, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=110.2MB dets=613527
+[2026-11-01 17:00:10] uv run python scripts/run_inference.py --model yolo11m --dataset kitti --imgsz 640

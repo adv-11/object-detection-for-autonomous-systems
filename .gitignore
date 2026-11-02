@@ -13,3 +13,5 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 results/raw/
+report/_built.md
+report/report.html

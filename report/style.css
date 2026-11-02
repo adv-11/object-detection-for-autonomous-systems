@@ -42,3 +42,6 @@ ol.refs, #refs { font-size: 8.6pt; line-height: 1.32; text-align: left; }
 .small { font-size: 8.6pt; }
 .keyfinding { border-left: 3px solid var(--accent); padding: .2em .8em; margin: .6em 0; background: #f3f7fc; }
 .pagebreak { break-before: page; }
+div.sourceCode, pre.sourceCode { overflow: visible !important; background: var(--tint); }
+pre.sourceCode code, pre.sourceCode code > span { white-space: pre-wrap !important; word-break: break-all; }
+pre > code.sourceCode > span { display: inline; }
