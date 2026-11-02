@@ -7,7 +7,16 @@ date: "Code, configs and command log: github.com/adv-11/object-detection-for-aut
 
 <div class="abstract">
 
-ABSTRACT_PLACEHOLDER
+We evaluate eight COCO-trained 2D detector configurations from six families — Faster R-CNN, RetinaNet, FCOS, YOLO11 (s, m),
+RT-DETR and the open-vocabulary YOLO-World and Grounding DINO — under one protocol on COCO val2017 and, without retraining, on the KITTI
+driving benchmark, and then fine-tune a small detector on KITTI. All eight models reproduce their published COCO AP within 0.9 points.
+Transferred to KITTI, Car accuracy is essentially preserved (COCO-style AP 49.9 → 50.4 for Faster R-CNN) while Pedestrian and Cyclist
+lose about two-thirds of their AP, through a mix of taxonomy mismatch, annotation convention and resize-induced shrinkage. The largest
+zero-shot levers are not architectural: keeping KITTI's wide frames at 1280 px adds 7.6 Moderate mAP to YOLO11m, and the COCO→KITTI
+Cyclist mapping alone swings Cyclist AP by up to 50 points. YOLO-World-L, sixth on COCO, is the best zero-shot KITTI detector
+(70.9 Moderate mAP), yet prompting it with KITTI's own class names is far worse than using COCO names and a geometric mapping. Five
+epochs (8 minutes) of fine-tuning lift YOLO11s from 52.1 to 65.8 Moderate mAP, mostly by fixing localisation at KITTI's 0.7 Car IoU. An
+adversarial review of the evaluation code found and fixed an ignore-rule bug before any result was reported.
 
 </div>
 
@@ -135,11 +144,11 @@ the open-vocabulary models within 0.1 of their papers. The small, one-directiona
 explained by our protocol: we cap at 100 detections per image and run batch-1 letterboxed inference, whereas the Ultralytics
 validator keeps 300 detections and uses rectangular batches. RT-DETR-L is the most accurate model (52.6 AP, best on every scale),
 YOLO11m is 1.6 AP behind at half the latency, and the 2019–2020-era dense detectors (RetinaNet, FCOS) trail by 11–13 AP. On this
-power-limited laptop GPU the real-time models are 2–4× faster than the torchvision R50-FPN detectors, while Grounding DINO costs
+power-limited laptop GPU the YOLO models are 2.5–4× and RT-DETR-L 1.3–1.8× faster than the torchvision R50-FPN detectors, while Grounding DINO costs
 ~0.46 s per image, 15× YOLO11m (Figure 1). Absolute latencies are FP32 eager-PyTorch numbers including Python pre/post-processing
 and are not comparable to the TensorRT FP16 figures in the papers.
 
-<figure><img src="../figures/fig_speed_accuracy.png" style="width:78%"><figcaption>Figure 1. Speed–accuracy on COCO val2017 (batch 1, FP32, 45 W laptop GPU).</figcaption></figure>
+<figure><img src="../figures/fig_speed_accuracy.png" style="width:62%"><figcaption>Figure 1. Speed–accuracy on COCO val2017 (batch 1, FP32, 45 W laptop GPU).</figcaption></figure>
 
 ## 4.2 KITTI val without retraining (cross-domain)
 
@@ -149,22 +158,23 @@ and are not comparable to the TensorRT FP16 figures in the papers.
 The last row is the fine-tuned model (Section 5.4).</p>
 
 Without retraining, every detector loses roughly half of its COCO-style AP on KITTI (Table 3), but the loss is very unevenly
-distributed across classes and scales (Section 5.1). KITTI_BEST
+distributed across classes and scales (Section 5.1). The best zero-shot result is YOLO-World-L at 1280 px (70.9 Moderate mAP); the best closed-set one is YOLO11m at 1280 px (65.3). Both
+remain below what 8 minutes of fine-tuning achieves with a smaller model at a smaller input (Section 5.6).
 
 # 5. Technical analyses
 
 ## 5.1 Cross-dataset generalization: which classes and scales degrade?
 
-<figure><img src="../figures/fig_domain_shift_per_class.png" style="width:100%"><figcaption>Figure 2. Per-class AP@[.50:.95] on COCO val2017
+<figure><img src="../figures/fig_domain_shift_per_class.png" style="width:86%"><figcaption>Figure 2. Per-class AP@[.50:.95] on COCO val2017
 (blue) and zero-shot on KITTI val (orange). Ultralytics models use 640 px on both datasets; YOLO-World uses 1280 px on KITTI.</figcaption></figure>
 
 **Car transfers; people do not.** COCO-trained detectors find KITTI cars about as well as COCO cars: Faster R-CNN scores 49.9 AP on
-COCO `car` and 50.4 on KITTI Car; YOLO11s 45.4 vs. 48.7 (Figure 2). Car AP50 on KITTI is 85–86 for every model. Pedestrian AP,
-in contrast, falls from ~59–63 on COCO `person` to 17–24 on KITTI, and Cyclist from 35–41 (`bicycle`) to 7–14. Three effects
+COCO `car` and 50.4 on KITTI Car; YOLO11s 45.4 vs. 48.7 (Figure 2). Car AP50 on KITTI is 85–89 for every model. Pedestrian AP,
+in contrast, falls from ~59–63 on COCO `person` to 17–25 on KITTI, and Cyclist from 35–41 (`bicycle`) to 7–17. Three effects
 compound for people: (i) **taxonomy** — COCO `person` includes riders and sitting people, so correct COCO behaviour produces KITTI false
-positives (`confusion:Cyclist` is a leading Pedestrian error class in Section 6); (ii) **annotation convention** — KITTI pedestrian
+positives (`confusion:Cyclist` is a major Pedestrian error class in Section 6); (ii) **annotation convention** — KITTI pedestrian
 boxes are tight, labelled down to small sizes, and heavily occluded instances count, so many detections that would be correct on COCO
-fail the stricter IoU thresholds (Pedestrian AP50 is 42–59 while Car AP50 is 85–86); (iii) **scale after resizing** — at 640 px the
+fail the stricter IoU thresholds (Pedestrian AP50 is 42–61 while Car AP50 is 85–89); (iii) **scale after resizing** — at 640 px the
 1242×375 frame is downsampled ×0.52, turning a median 96-px pedestrian into a 50-px one and the tail into sub-20-px objects.
 
 **Scale is a resizing artefact, not a property of the data.** At native resolution KITTI objects are not smaller than COCO's
@@ -172,10 +182,10 @@ fail the stricter IoU thresholds (Pedestrian AP50 is 42–59 while Car AP50 is 8
 fit a 640-px input. Running the same YOLO11m weights at 1280 px — no retraining — raises KITTI AP from 27.2 to 29.8, small-object AP
 from 16.4 to 22.4, and Moderate mAP from 57.7 to 65.3; Cyclist Moderate AP jumps from 35.0 to 50.9 and Pedestrian from 64.9 to 70.5,
 while Car changes little (73.2 → 74.4) because cars are large enough at either size. On COCO the usual degradation runs from large to
-small objects (APl 67 → APs 33 for YOLO11m); on KITTI APl is only 36–38 for every model, because "large" KITTI objects are mostly near,
+small objects (APl 67 → APs 33 for YOLO11m); on KITTI APl is only 36–40 for every model, because "large" KITTI objects are mostly near,
 truncated cars at the image border, whose boxes COCO models localise poorly at IoU ≥ 0.75.
 
-<figure><img src="../figures/fig_scale_distribution.png" style="width:96%"><figcaption>Figure 3. Box heights at native resolution for the
+<figure><img src="../figures/fig_scale_distribution.png" style="width:82%"><figcaption>Figure 3. Box heights at native resolution for the
 three shared classes. KITTI objects are not smaller than COCO's in pixels; downsampling the 1242-px-wide frame to 640 px halves them.</figcaption></figure>
 
 **Difficulty.** Moderate → Hard costs every zero-shot model 7–9 mAP points (e.g. YOLO11m@1280: 73.3 / 65.3 / 56.1 for Easy / Moderate /
@@ -184,15 +194,15 @@ Hard), so occlusion and truncation are hard independently of the domain gap.
 ## 5.2 Architecture comparison: two-stage vs. one-stage vs. DETR
 
 At the same nominal 640-px setting, the transformer RT-DETR-L generalises best among the closed-set models: 28.9 KITTI AP and 60.7
-Moderate mAP versus 27.2 / 57.7 for the CNN YOLO11m, with the best zero-shot Car result (77.0 Moderate) and the highest recall on
-sub-25-px objects (Car 79% vs. 64% for YOLO11s). Read naively, this says set prediction and global attention transfer better. The input
+Moderate mAP versus 27.2 / 57.7 for the CNN YOLO11m, with the best zero-shot Car result (77.0 Moderate) and much higher recall than
+YOLO11s on sub-25-px objects (Car 79% vs. 64%). Read naively, this says set prediction and global attention transfer better. The input
 pipelines say otherwise: Ultralytics stretches RT-DETR's input to a 640×640 square, so a KITTI frame is *upsampled* vertically (375 → 640 px)
 and the model sees 3.3× more pixels than YOLO11m's 640×194 letterbox; tall, thin pedestrians keep their height. Given a comparable pixel
 budget, the CNN wins — YOLO11m at 1280×387 reaches 65.3 Moderate mAP, 4.6 above RT-DETR-L — so on KITTI the input geometry matters more
 than the detector family. The two-stage Faster R-CNN at its native ~1333×402 input is competitive overall (58.8 Moderate mAP) and the best
 zero-shot Cyclist detector (49.9) but the worst on Pedestrian (51.1), where its many confident person boxes are penalised by the mapping
 (Section 5.3); its region-based box refinement does not help at KITTI's 0.7 Car IoU (19% of its matched cars fall below 0.7, the same as
-RT-DETR and YOLO11s). All closed-set families converge to AP75 ≈ 23–25 on KITTI despite spanning 46.9–52.6 AP on COCO: the shared COCO
+RT-DETR and YOLO11s). All closed-set families converge to AP75 ≈ 22–26 on KITTI despite spanning 46.1–52.6 AP on COCO: the shared COCO
 training signal, not the architecture, sets the zero-shot ceiling.
 
 ## 5.3 Taxonomy mismatch: how much is the Cyclist mapping worth?
@@ -200,11 +210,11 @@ training signal, not the architecture, sets the zero-shot ceiling.
 <!--TABLE:mapping-->
 <p class="tcap">Table 4. Sensitivity of Pedestrian/Cyclist accuracy to the Cyclist mapping (COCO-style AP and Moderate AP|R40).</p>
 
-With the naive **direct** mapping, Cyclist Moderate AP is 0.3–0.4 for every closed-set model: a bicycle-only box never reaches IoU 0.5
+With the naive **direct** mapping, Cyclist Moderate AP is 0.1–0.7 for every COCO-vocabulary model: a bicycle-only box never reaches IoU 0.5
 with a KITTI box that also contains the rider. Fusing person and bicycle recovers it to 24–51. The geometric rule then trades the two
 classes against each other: the **strict** rule (default) gives the best Cyclist AP for every detector, while its duplicate suppression
 lowers the scores of people standing next to bikes, which costs Faster R-CNN 11 Pedestrian points but YOLO11 almost nothing (its
-multi-label NMS already merges overlapping person boxes). Swings of up to 50 AP on one class from a few lines of post-processing show
+multi-label NMS already merges overlapping person boxes). Swings of up to 50 AP for closed-set models (61 for YOLO-World) on one class from a few lines of post-processing show
 that cross-taxonomy numbers are only meaningful together with the mapping that produced them.
 
 ## 5.4 Closed-set vs. open-vocabulary
@@ -212,11 +222,24 @@ that cross-taxonomy numbers are only meaningful together with the mapping that p
 <!--TABLE:prompt-->
 <p class="tcap">Table 5. Open-vocabulary detectors on KITTI val with different prompt vocabularies (COCO-style AP and Moderate AP|R40).</p>
 
-OPENVOCAB_PARAGRAPH
+**Open-vocabulary pre-training generalises best — but not through the prompts.** YOLO-World-L, *queried with the 80 COCO names and
+the same COCO→KITTI mapping as the closed-set models*, is the strongest zero-shot detector in the study: 32.1 KITTI AP and 70.9 Moderate
+mAP (Car 79.7, Pedestrian 71.6, Cyclist 61.5), ahead of YOLO11m at the same 1280-px input (65.3) even though it is 5.9 AP *worse* on COCO
+(45.1 vs. 51.0). Its region-text pre-training on Objects365, GoldG and pseudo-labelled CC3M [15] covers far more scenes, scales and
+viewpoints than COCO alone, and that breadth transfers to the road better than in-domain COCO accuracy does. In-domain rank is therefore
+a poor predictor of out-of-domain rank.
+
+**Prompting with KITTI's own class names makes it worse.** Replacing the COCO vocabulary by KITTI's names drops Pedestrian from 71.6 to
+42.6 and Cyclist from 61.5 to 20.5 (Table 5); the descriptive phrase "person riding a bicycle" is worse still (Cyclist 9.8). Car, whose
+name is identical in both vocabularies, barely moves (79.7 → 76.2). "Pedestrian" and "cyclist" are rare words in image-text data
+compared with "person" and "bicycle", so their text embeddings are poorly grounded, and a phrase describes a relation (person *on*
+bicycle) that a region-text matcher scores on the person region alone, so the predicted box misses the bike. The promise of
+open-vocabulary detection — "just name the target classes" — did not hold here: the closed-set-style vocabulary plus an explicit
+geometric mapping beat every KITTI-native prompt.
 
 ## 5.5 Speed–accuracy trade-off
 
-On COCO the Pareto front on this GPU is YOLO11s (29 ms, 46.1 AP) → YOLO11m (32 ms, 51.0) → RT-DETR-L (61 ms, 52.6); the torchvision
+On COCO the Pareto front on this GPU is YOLO-World-L (27 ms, 45.1 AP) → YOLO11s (29 ms, 46.1) → YOLO11m (32 ms, 51.0) → RT-DETR-L (61 ms, 52.6); the torchvision
 detectors are dominated (81–109 ms for 39–47 AP) and Grounding DINO pays 464 ms for open-vocabulary flexibility at 48.3 AP. On KITTI,
 input resolution becomes the main speed–accuracy knob: YOLO11m at 1280 px gains 7.6 Moderate mAP over 640 px, more than the gap between
 YOLO11s and YOLO11m at the same resolution (5.6). Peak GPU memory is small for every real-time model (0.1–0.3 GB at batch 1) and largest
@@ -225,7 +248,7 @@ at 1280 px did not fit and the fine-tune had to use YOLO11s.
 
 ## 5.6 Fine-tuning: zero-shot vs. adapted
 
-<figure><img src="../figures/fig_finetune.png" style="width:70%"><figcaption>Figure 4. YOLO11s at 640 px: COCO weights zero-shot vs. after
+<figure><img src="../figures/fig_finetune.png" style="width:56%"><figcaption>Figure 4. YOLO11s at 640 px: COCO weights zero-shot vs. after
 5 epochs (8 minutes) of fine-tuning on KITTI train. KITTI val Moderate AP|R40.</figcaption></figure>
 
 Five epochs on KITTI train (3,712 images, 8 minutes, 4.1 GB) lift YOLO11s from 25.5 to 38.2 COCO-style AP and from 52.1 to 65.8 Moderate
@@ -233,7 +256,7 @@ mAP (Figure 4). Car gains the most (72.0 → 86.6 Moderate) even though it "tran
 share of matched cars whose IoU falls below KITTI's 0.7 threshold drops from 21% to 9% (Section 6). Cyclist nearly doubles
 (24.4 → 43.8) because the model now predicts KITTI's rider-plus-bike box directly. Pedestrian gains least (60.0 → 67.0): with ~2,200
 training pedestrians and 5 epochs at 640 px, recall on pedestrians shorter than 40 px actually falls. The 5-epoch, 640-px YOLO11s already
-matches YOLO11m zero-shot at 1280 px (65.8 vs. 65.3 Moderate mAP) at roughly a third of the latency: **for a fixed deployment budget, a few
+matches YOLO11m zero-shot at 1280 px (65.8 vs. 65.3 Moderate mAP) at roughly half the latency (22 vs. 45 ms): **for a fixed deployment budget, a few
 minutes of in-domain fine-tuning are worth more than a larger model or a larger input.**
 
 # 6. Failure analysis
@@ -242,23 +265,24 @@ minutes of in-domain fine-tuning are worth more than a larger model or a larger 
 <p class="tcap">Table 6. Recall (all detections, class IoU threshold) by ground-truth box height (px) and occlusion level, and share of
 matched Car detections (score ≥ 0.3, IoU ≥ 0.5) whose IoU is below 0.7.</p>
 
-<figure><img src="../figures/fig_fp_taxonomy.png" style="width:100%"><figcaption>Figure 5. False positives at score ≥ 0.3, classified
+<figure><img src="../figures/fig_fp_taxonomy.png" style="width:88%"><figcaption>Figure 5. False positives at score ≥ 0.3, classified
 TIDE-style [23] against the full KITTI label set: localisation (same-class GT with 0.1 ≤ IoU < threshold), confusion (IoU ≥ 0.5 with a GT of
 another class), duplicate, background. Detections absorbed by ignore regions are excluded.</figcaption></figure>
 
-**Localisation, not detection, limits Car.** Zero-shot detectors find 85–97% of cars taller than 100 px, yet 19–21% of the cars they match
+**Localisation, not detection, limits Car.** Zero-shot detectors find 85–86% of cars taller than 100 px, yet 19–21% of the cars they match
 at IoU 0.5 fall short of 0.7, and localisation errors are the largest Car false-positive class for the YOLO models (Figure 5). COCO's box
 convention for partially visible and truncated vehicles differs from KITTI's, and the strict 0.7 IoU turns that into misses. Fine-tuning
 halves the problem (9% below 0.7).
 
-**Small and occluded people are missed; riders are double-counted.** Pedestrian and Cyclist recall falls steeply below 40 px (YOLO11s@640
-zero-shot: Cyclist 2% below 25 px vs. 85% above 100 px), and heavy occlusion roughly halves Pedestrian recall. Among Pedestrian false
-positives, `confusion:Cyclist` (a rider detected as a pedestrian) is a leading class after background, a direct symptom of the taxonomy
+**Small and occluded people are missed; riders are double-counted.** For the 640-px YOLO models, Pedestrian and Cyclist recall falls
+steeply below 40 px (YOLO11s zero-shot: Cyclist 2% below 25 px vs. 85% above 100 px), while the higher-resolution inputs of Faster R-CNN
+and RT-DETR keep small-pedestrian recall near their large-object level, and heavy occlusion roughly halves Pedestrian recall. Among Pedestrian false
+positives, `confusion:Cyclist` (a rider detected as a pedestrian) is the third-largest class after background and localisation, a direct symptom of the taxonomy
 gap; after fine-tuning the dominant Cyclist error flips to the opposite confusion (pedestrians walking next to bikes called cyclists).
 Background false positives (poles, signs, shop fronts detected as people) are several times more frequent for Faster R-CNN than for
 YOLO11 at the same 0.3 operating point, reflecting different score calibration rather than worse ranking.
 
-<figure><img src="../figures/fig_qualitative.png" style="width:100%"><figcaption>Figure 6. KITTI val examples (score ≥ 0.3). Blue: Car,
+<figure><img src="../figures/fig_qualitative.png" style="width:92%"><figcaption>Figure 6. KITTI val examples (score ≥ 0.3). Blue: Car,
 orange: Pedestrian, aqua: Cyclist; grey dotted: ignore regions. Left to right: ground truth, YOLO11s@640 zero-shot, fine-tuned. Zero-shot misses the distant cyclist (row 1) or calls it a pedestrian
 (row 3) and misses far, small cars; the fine-tuned model recovers both, but still splits the occluded pedestrian at the left edge of row 2.</figcaption></figure>
 
@@ -279,7 +303,9 @@ devkit ignore rules reproduced and unit-tested) but was not cross-checked agains
    people lose about two-thirds of their AP to taxonomy, box-convention and resize effects.
 3. **The biggest zero-shot levers are the input pipeline and the label mapping, not the architecture:** keeping KITTI at 1280 px adds
    7.6 Moderate mAP to YOLO11m, and the Cyclist mapping alone swings Cyclist AP by up to 50 points.
-4. OPENVOCAB_CONCLUSION
+4. **Broad open-vocabulary pre-training transfers better than COCO accuracy, but prompts are not a substitute for a mapping:**
+   YOLO-World-L is the best zero-shot KITTI detector (70.9 Moderate mAP) despite ranking sixth on COCO, yet prompting it with KITTI's
+   own class names loses 41 Cyclist AP (52 with a descriptive phrase) relative to COCO names plus a geometric mapping.
 5. **A few minutes of fine-tuning beat everything else:** 5 epochs on KITTI train lift YOLO11s by 13.7 Moderate mAP, mostly by fixing
    localisation at KITTI's 0.7 IoU, making a small 640-px model as accurate as a larger 1280-px zero-shot one.
 6. **Evaluation code deserves the same scrutiny as models:** an adversarial review caught an ignore-rule bug that would have inflated every

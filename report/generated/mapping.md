@@ -15,3 +15,6 @@
 | RT-DETR-L | direct | 21.5 | 0.1 | 60.0 | 0.1 | 45.7 |
 | RT-DETR-L | fused (loose) | 20.7 | 9.1 | 60.6 | 31.2 | 56.3 |
 | RT-DETR-L | fused (strict, default) | 22.7 | 11.1 | 64.4 | 40.6 | 60.7 |
+| YOLO-World-L (COCO vocab.) | direct | 22.2 | 0.3 | 62.5 | 0.7 | 47.6 |
+| YOLO-World-L (COCO vocab.) | fused (loose) | 24.0 | 15.2 | 69.5 | 53.6 | 67.6 |
+| YOLO-World-L (COCO vocab.) | fused (strict, default) | 24.9 | 17.2 | 71.6 | 61.5 | 70.9 |
