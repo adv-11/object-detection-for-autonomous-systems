@@ -1,0 +1,918 @@
+{
+ "zeroshot": {
+  "dfine_s_coco": {
+   "coco": {
+    "AP": 48.29,
+    "AP50": 65.09,
+    "AP75": 52.34,
+    "APs": 28.95,
+    "APm": 52.04,
+    "APl": 65.29,
+    "AR100": 66.44
+   },
+   "kitti640": {
+    "mod": 54.2,
+    "Car": 75.75,
+    "Pedestrian": 58.45,
+    "Cyclist": 28.41,
+    "easy": 62.11,
+    "hard": 46.78,
+    "ap": 27.08
+   },
+   "kitti1280": {
+    "mod": 50.25,
+    "Car": 65.56,
+    "Pedestrian": 49.63,
+    "Cyclist": 35.56,
+    "easy": 57.04,
+    "hard": 45.06,
+    "ap": 24.96
+   }
+  },
+  "dfine_s_o365": {
+   "coco": {
+    "AP": 50.5,
+    "AP50": 67.31,
+    "AP75": 54.87,
+    "APs": 32.6,
+    "APm": 54.42,
+    "APl": 66.35,
+    "AR100": 68.77
+   },
+   "kitti640": {
+    "mod": 56.84,
+    "Car": 75.32,
+    "Pedestrian": 61.7,
+    "Cyclist": 33.51,
+    "easy": 64.91,
+    "hard": 49.12,
+    "ap": 28.05
+   },
+   "kitti1280": {
+    "mod": 60.84,
+    "Car": 79.65,
+    "Pedestrian": 57.5,
+    "Cyclist": 45.36,
+    "easy": 68.33,
+    "hard": 53.64,
+    "ap": 28.59
+   }
+  },
+  "dfine_m_coco": {
+   "coco": {
+    "AP": 52.05,
+    "AP50": 69.49,
+    "AP75": 56.17,
+    "APs": 32.61,
+    "APm": 56.32,
+    "APl": 70.03,
+    "AR100": 68.89
+   },
+   "kitti640": {
+    "mod": 58.75,
+    "Car": 76.2,
+    "Pedestrian": 60.63,
+    "Cyclist": 39.43,
+    "easy": 66.8,
+    "hard": 50.59,
+    "ap": 28.72
+   },
+   "kitti1280": {
+    "mod": 65.35,
+    "Car": 79.87,
+    "Pedestrian": 63.93,
+    "Cyclist": 52.26,
+    "easy": 75.09,
+    "hard": 57.87,
+    "ap": 31.92
+   }
+  },
+  "dfine_m_o365": {
+   "coco": {
+    "AP": 54.88,
+    "AP50": 72.28,
+    "AP75": 59.48,
+    "APs": 37.06,
+    "APm": 59.17,
+    "APl": 71.56,
+    "AR100": 72.13
+   },
+   "kitti640": {
+    "mod": 63.53,
+    "Car": 76.29,
+    "Pedestrian": 65.49,
+    "Cyclist": 48.83,
+    "easy": 71.43,
+    "hard": 54.99,
+    "ap": 29.95
+   },
+   "kitti1280": {
+    "mod": 72.71,
+    "Car": 85.77,
+    "Pedestrian": 67.78,
+    "Cyclist": 64.59,
+    "easy": 81.95,
+    "hard": 63.7,
+    "ap": 34.69
+   }
+  },
+  "yolo11s": {
+   "coco": {
+    "AP": 46.14,
+    "AP50": 62.81,
+    "AP75": 49.92,
+    "APs": 28.51,
+    "APm": 50.76,
+    "APl": 63.45,
+    "AR100": 62.74
+   },
+   "kitti640": {
+    "mod": 52.14,
+    "Car": 72.0,
+    "Pedestrian": 59.98,
+    "Cyclist": 24.43,
+    "easy": 62.96,
+    "hard": 44.34,
+    "ap": 25.47
+   },
+   "kitti1280": {
+    "mod": 64.37,
+    "Car": 77.13,
+    "Pedestrian": 69.04,
+    "Cyclist": 46.94,
+    "easy": 73.14,
+    "hard": 55.21,
+    "ap": 29.21
+   }
+  },
+  "yolo26s": {
+   "coco": {
+    "AP": 47.92,
+    "AP50": 64.55,
+    "AP75": 51.93,
+    "APs": 29.16,
+    "APm": 52.46,
+    "APl": 65.0,
+    "AR100": 65.07
+   },
+   "kitti640": {
+    "mod": 53.77,
+    "Car": 72.8,
+    "Pedestrian": 62.64,
+    "Cyclist": 25.86,
+    "easy": 64.93,
+    "hard": 46.01,
+    "ap": 26.08
+   },
+   "kitti1280": {
+    "mod": 64.76,
+    "Car": 76.74,
+    "Pedestrian": 69.26,
+    "Cyclist": 48.28,
+    "easy": 73.36,
+    "hard": 55.67,
+    "ap": 29.36
+   }
+  },
+  "yolo11m": {
+   "coco": {
+    "AP": 51.03,
+    "AP50": 67.78,
+    "AP75": 55.51,
+    "APs": 33.34,
+    "APm": 56.51,
+    "APl": 67.22,
+    "AR100": 67.35
+   },
+   "kitti640": {
+    "mod": 57.69,
+    "Car": 73.15,
+    "Pedestrian": 64.9,
+    "Cyclist": 35.02,
+    "easy": 67.5,
+    "hard": 49.45,
+    "ap": 27.2
+   },
+   "kitti1280": {
+    "mod": 65.27,
+    "Car": 74.41,
+    "Pedestrian": 70.53,
+    "Cyclist": 50.88,
+    "easy": 73.28,
+    "hard": 56.08,
+    "ap": 29.78
+   }
+  },
+  "yolo26m": {
+   "coco": {
+    "AP": 52.69,
+    "AP50": 70.05,
+    "AP75": 57.29,
+    "APs": 36.11,
+    "APm": 57.56,
+    "APl": 68.8,
+    "AR100": 69.46
+   },
+   "kitti640": {
+    "mod": 60.33,
+    "Car": 74.66,
+    "Pedestrian": 65.99,
+    "Cyclist": 40.33,
+    "easy": 70.56,
+    "hard": 51.74,
+    "ap": 27.97
+   },
+   "kitti1280": {
+    "mod": 66.02,
+    "Car": 76.19,
+    "Pedestrian": 70.07,
+    "Cyclist": 51.81,
+    "easy": 73.54,
+    "hard": 56.8,
+    "ap": 29.99
+   }
+  }
+ },
+ "yoloworld_vocab": {
+  "YOLO-World-S v2": {
+   "coco_AP": 37.03,
+   "coco_vocab": {
+    "mod": 64.51,
+    "Car": 81.88,
+    "Pedestrian": 63.06,
+    "Cyclist": 48.59,
+    "easy": 74.59,
+    "hard": 55.52,
+    "ap": 30.33
+   },
+   "kitti_vocab": {
+    "mod": 48.63,
+    "Car": 82.02,
+    "Pedestrian": 40.1,
+    "Cyclist": 23.76,
+    "easy": 56.69,
+    "hard": 41.38,
+    "ap": 24.56
+   }
+  },
+  "YOLO-World-L v2": {
+   "coco_AP": 45.12,
+   "coco_vocab": {
+    "mod": 70.94,
+    "Car": 79.73,
+    "Pedestrian": 71.57,
+    "Cyclist": 61.52,
+    "easy": 78.94,
+    "hard": 61.69,
+    "ap": 32.09
+   },
+   "kitti_vocab": {
+    "mod": 46.41,
+    "Car": 76.15,
+    "Pedestrian": 42.59,
+    "Cyclist": 20.5,
+    "easy": 52.68,
+    "hard": 39.78,
+    "ap": 23.34
+   }
+  }
+ },
+ "budget": {
+  "YOLO11s@0.05": {
+   "n_images": 186,
+   "seeds": 3,
+   "runs": [
+    "kitti__yolo11s_1280_ft5_s0",
+    "kitti__yolo11s_1280_ft5_s1",
+    "kitti__yolo11s_1280_ft5_s2"
+   ],
+   "per_seed_mod": [
+    66.41,
+    69.57,
+    65.7
+   ],
+   "mod": [
+    67.22666666666667,
+    2.0602022554432162
+   ],
+   "Car": [
+    90.77,
+    0.2946183972531235
+   ],
+   "Pedestrian": [
+    68.39666666666666,
+    2.8521804524492005
+   ],
+   "Cyclist": [
+    42.52,
+    3.3716019931184062
+   ],
+   "easy": [
+    77.91666666666667,
+    2.6873096831837815
+   ],
+   "hard": [
+    62.550000000000004,
+    1.9637464194747727
+   ],
+   "ap": [
+    38.879999999999995,
+    0.762692598626734
+   ]
+  },
+  "YOLO11s@0.25": {
+   "n_images": 928,
+   "seeds": 3,
+   "runs": [
+    "kitti__yolo11s_1280_ft25",
+    "kitti__yolo11s_1280_ft25_s1",
+    "kitti__yolo11s_1280_ft25_s2"
+   ],
+   "per_seed_mod": [
+    77.05,
+    74.16,
+    73.88
+   ],
+   "mod": [
+    75.02999999999999,
+    1.7549643871030554
+   ],
+   "Car": [
+    93.31333333333333,
+    0.23007245235650248
+   ],
+   "Pedestrian": [
+    71.61333333333333,
+    0.8363213098644147
+   ],
+   "Cyclist": [
+    60.166666666666664,
+    5.865154161088469
+   ],
+   "easy": [
+    85.10666666666667,
+    1.5592412684807126
+   ],
+   "hard": [
+    70.58,
+    1.6604517457607701
+   ],
+   "ap": [
+    44.876666666666665,
+    0.6137045977775712
+   ]
+  },
+  "YOLO11s@1.0": {
+   "n_images": 3712,
+   "seeds": 1,
+   "runs": [
+    "kitti__yolo11s_1280_ft"
+   ],
+   "per_seed_mod": [
+    75.49
+   ],
+   "mod": [
+    75.49,
+    null
+   ],
+   "Car": [
+    93.75,
+    null
+   ],
+   "Pedestrian": [
+    73.46,
+    null
+   ],
+   "Cyclist": [
+    59.27,
+    null
+   ],
+   "easy": [
+    86.88,
+    null
+   ],
+   "hard": [
+    71.01,
+    null
+   ],
+   "ap": [
+    45.23,
+    null
+   ]
+  },
+  "YOLO-World-S@0.05": {
+   "n_images": 186,
+   "seeds": 3,
+   "runs": [
+    "kitti__yolo_world_s_1280_ft5_s0",
+    "kitti__yolo_world_s_1280_ft5_s1",
+    "kitti__yolo_world_s_1280_ft5_s2"
+   ],
+   "per_seed_mod": [
+    71.2,
+    72.88,
+    69.96
+   ],
+   "mod": [
+    71.34666666666665,
+    1.4655146991188233
+   ],
+   "Car": [
+    91.89666666666665,
+    0.08082903768654794
+   ],
+   "Pedestrian": [
+    72.45666666666666,
+    0.731049473930002
+   ],
+   "Cyclist": [
+    49.68666666666667,
+    3.991106780497524
+   ],
+   "easy": [
+    81.42333333333333,
+    1.356809984239991
+   ],
+   "hard": [
+    66.25666666666667,
+    1.2750032679696668
+   ],
+   "ap": [
+    41.22,
+    0.6425729530566935
+   ]
+  },
+  "YOLO-World-S@0.25": {
+   "n_images": 928,
+   "seeds": 3,
+   "runs": [
+    "kitti__yolo_world_s_1280_ft25_s0",
+    "kitti__yolo_world_s_1280_ft25_s1",
+    "kitti__yolo_world_s_1280_ft25_s2"
+   ],
+   "per_seed_mod": [
+    75.3,
+    77.83,
+    76.24
+   ],
+   "mod": [
+    76.45666666666666,
+    1.278840620770757
+   ],
+   "Car": [
+    93.45666666666666,
+    0.12583057392117955
+   ],
+   "Pedestrian": [
+    74.99666666666667,
+    0.6222807512155069
+   ],
+   "Cyclist": [
+    60.919999999999995,
+    3.4883950464361093
+   ],
+   "easy": [
+    86.64666666666666,
+    1.9400085910462748
+   ],
+   "hard": [
+    72.15333333333334,
+    1.0531065156636947
+   ],
+   "ap": [
+    45.51,
+    0.625539766921337
+   ]
+  },
+  "YOLO-World-S@1.0": {
+   "n_images": 3712,
+   "seeds": 1,
+   "runs": [
+    "kitti__yolo_world_s_1280_ft"
+   ],
+   "per_seed_mod": [
+    75.34
+   ],
+   "mod": [
+    75.34,
+    null
+   ],
+   "Car": [
+    94.05,
+    null
+   ],
+   "Pedestrian": [
+    72.76,
+    null
+   ],
+   "Cyclist": [
+    59.22,
+    null
+   ],
+   "easy": [
+    85.32,
+    null
+   ],
+   "hard": [
+    71.29,
+    null
+   ],
+   "ap": [
+    45.61,
+    null
+   ]
+  }
+ },
+ "budget_zero": {
+  "YOLO11s": {
+   "mod": 64.37,
+   "Car": 77.13,
+   "Pedestrian": 69.04,
+   "Cyclist": 46.94,
+   "easy": 73.14,
+   "hard": 55.21,
+   "ap": 29.21
+  },
+  "YOLO-World-S": {
+   "mod": 64.51,
+   "Car": 81.88,
+   "Pedestrian": 63.06,
+   "Cyclist": 48.59,
+   "easy": 74.59,
+   "hard": 55.52,
+   "ap": 30.33
+  }
+ },
+ "finetune_cost": {
+  "yolo11s_kitti_1280_e20_f0.05": {
+   "train_hours": 0.1,
+   "peak_mem_gb": 4.63
+  },
+  "yolo11s_kitti_1280_e20_f0.05_s1": {
+   "train_hours": 0.08,
+   "peak_mem_gb": 4.62
+  },
+  "yolo11s_kitti_1280_e20_f0.05_s2": {
+   "train_hours": 0.09,
+   "peak_mem_gb": 4.62
+  },
+  "yolo11s_kitti_1280_e20_f0.25": {
+   "train_hours": 0.38,
+   "peak_mem_gb": 4.62
+  },
+  "yolo11s_kitti_1280_e20_f0.25_s1": {
+   "train_hours": 0.3,
+   "peak_mem_gb": 4.62
+  },
+  "yolo11s_kitti_1280_e20_f0.25_s2": {
+   "train_hours": 0.3,
+   "peak_mem_gb": 4.62
+  },
+  "yolo11s_kitti_1280_e20_f1": {
+   "train_hours": 1.24,
+   "peak_mem_gb": 4.64
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.05": {
+   "train_hours": 0.09,
+   "peak_mem_gb": 4.12
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.05_s1": {
+   "train_hours": 0.09,
+   "peak_mem_gb": 4.13
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.05_s2": {
+   "train_hours": 0.09,
+   "peak_mem_gb": 4.27
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.25": {
+   "train_hours": 0.32,
+   "peak_mem_gb": 4.21
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.25_s1": {
+   "train_hours": 0.32,
+   "peak_mem_gb": 4.21
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f0.25_s2": {
+   "train_hours": 0.32,
+   "peak_mem_gb": 4.21
+  },
+  "yolov8s-worldv2_kitti_1280_e20_f1": {
+   "train_hours": 1.24,
+   "peak_mem_gb": 4.14
+  }
+ },
+ "speed": [
+  {
+   "model": "D-FINE-S COCO@640",
+   "key": "dfine_s_coco",
+   "domain": "coco",
+   "precision": "fp32",
+   "params_m": 10.3,
+   "ms_mean": 26.55,
+   "ms_p50": 25.94,
+   "ms_p90": 29.43,
+   "fps": 37.7,
+   "peak_mem_mb": 141.0
+  },
+  {
+   "model": "D-FINE-S COCO@640",
+   "key": "dfine_s_coco",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 10.3,
+   "ms_mean": 26.81,
+   "ms_p50": 26.72,
+   "ms_p90": 28.71,
+   "fps": 37.3,
+   "peak_mem_mb": 141.0
+  },
+  {
+   "model": "D-FINE-S COCO@640",
+   "key": "dfine_s_coco",
+   "domain": "coco",
+   "precision": "fp16",
+   "params_m": 10.3,
+   "ms_mean": 30.62,
+   "ms_p50": 30.64,
+   "ms_p90": 31.94,
+   "fps": 32.7,
+   "peak_mem_mb": 113.6
+  },
+  {
+   "model": "D-FINE-S COCO@640",
+   "key": "dfine_s_coco",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 10.3,
+   "ms_mean": 31.37,
+   "ms_p50": 31.28,
+   "ms_p90": 33.69,
+   "fps": 31.9,
+   "peak_mem_mb": 113.6
+  },
+  {
+   "model": "D-FINE-M COCO@640",
+   "key": "dfine_m_coco",
+   "domain": "coco",
+   "precision": "fp32",
+   "params_m": 19.6,
+   "ms_mean": 33.5,
+   "ms_p50": 32.9,
+   "ms_p90": 35.63,
+   "fps": 29.9,
+   "peak_mem_mb": 189.6
+  },
+  {
+   "model": "D-FINE-M COCO@640",
+   "key": "dfine_m_coco",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 19.6,
+   "ms_mean": 34.21,
+   "ms_p50": 33.83,
+   "ms_p90": 36.2,
+   "fps": 29.2,
+   "peak_mem_mb": 189.6
+  },
+  {
+   "model": "D-FINE-M COCO@640",
+   "key": "dfine_m_coco",
+   "domain": "coco",
+   "precision": "fp16",
+   "params_m": 19.6,
+   "ms_mean": 39.72,
+   "ms_p50": 38.83,
+   "ms_p90": 42.84,
+   "fps": 25.2,
+   "peak_mem_mb": 158.9
+  },
+  {
+   "model": "D-FINE-M COCO@640",
+   "key": "dfine_m_coco",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 19.6,
+   "ms_mean": 39.78,
+   "ms_p50": 39.44,
+   "ms_p90": 42.17,
+   "fps": 25.1,
+   "peak_mem_mb": 158.9
+  },
+  {
+   "model": "D-FINE-M COCO@1280",
+   "key": "dfine_m_coco",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 19.6,
+   "ms_mean": 77.41,
+   "ms_p50": 77.29,
+   "ms_p90": 80.48,
+   "fps": 12.9,
+   "peak_mem_mb": 505.1
+  },
+  {
+   "model": "D-FINE-M COCO@1280",
+   "key": "dfine_m_coco",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 19.6,
+   "ms_mean": 68.38,
+   "ms_p50": 67.0,
+   "ms_p90": 70.6,
+   "fps": 14.6,
+   "peak_mem_mb": 381.2
+  },
+  {
+   "model": "YOLO26s@640",
+   "key": "yolo26s",
+   "domain": "coco",
+   "precision": "fp32",
+   "params_m": 10.0,
+   "ms_mean": 19.59,
+   "ms_p50": 20.14,
+   "ms_p90": 25.05,
+   "fps": 51.1,
+   "peak_mem_mb": 92.6
+  },
+  {
+   "model": "YOLO26s@640",
+   "key": "yolo26s",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 10.0,
+   "ms_mean": 18.49,
+   "ms_p50": 18.88,
+   "ms_p90": 23.82,
+   "fps": 54.1,
+   "peak_mem_mb": 65.2
+  },
+  {
+   "model": "YOLO26s@640",
+   "key": "yolo26s",
+   "domain": "coco",
+   "precision": "fp16",
+   "params_m": 10.0,
+   "ms_mean": 21.98,
+   "ms_p50": 22.7,
+   "ms_p90": 26.91,
+   "fps": 45.5,
+   "peak_mem_mb": 54.9
+  },
+  {
+   "model": "YOLO26s@640",
+   "key": "yolo26s",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 10.0,
+   "ms_mean": 19.34,
+   "ms_p50": 18.93,
+   "ms_p90": 26.37,
+   "fps": 51.7,
+   "peak_mem_mb": 40.8
+  },
+  {
+   "model": "YOLO26s@1280",
+   "key": "yolo26s",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 10.0,
+   "ms_mean": 20.11,
+   "ms_p50": 20.01,
+   "ms_p90": 27.94,
+   "fps": 49.7,
+   "peak_mem_mb": 105.3
+  },
+  {
+   "model": "YOLO26s@1280",
+   "key": "yolo26s",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 10.0,
+   "ms_mean": 18.24,
+   "ms_p50": 16.34,
+   "ms_p90": 26.51,
+   "fps": 54.8,
+   "peak_mem_mb": 60.9
+  },
+  {
+   "model": "YOLO26m@640",
+   "key": "yolo26m",
+   "domain": "coco",
+   "precision": "fp32",
+   "params_m": 21.9,
+   "ms_mean": 22.05,
+   "ms_p50": 23.44,
+   "ms_p90": 26.52,
+   "fps": 45.3,
+   "peak_mem_mb": 172.6
+  },
+  {
+   "model": "YOLO26m@640",
+   "key": "yolo26m",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 21.9,
+   "ms_mean": 21.13,
+   "ms_p50": 21.79,
+   "ms_p90": 27.45,
+   "fps": 47.3,
+   "peak_mem_mb": 120.8
+  },
+  {
+   "model": "YOLO26m@640",
+   "key": "yolo26m",
+   "domain": "coco",
+   "precision": "fp16",
+   "params_m": 21.9,
+   "ms_mean": 18.15,
+   "ms_p50": 15.9,
+   "ms_p90": 26.82,
+   "fps": 55.1,
+   "peak_mem_mb": 93.9
+  },
+  {
+   "model": "YOLO26m@640",
+   "key": "yolo26m",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 21.9,
+   "ms_mean": 22.07,
+   "ms_p50": 23.32,
+   "ms_p90": 28.24,
+   "fps": 45.3,
+   "peak_mem_mb": 68.2
+  },
+  {
+   "model": "YOLO26m@1280",
+   "key": "yolo26m",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 21.9,
+   "ms_mean": 25.03,
+   "ms_p50": 25.01,
+   "ms_p90": 28.91,
+   "fps": 40.0,
+   "peak_mem_mb": 196.6
+  },
+  {
+   "model": "YOLO26m@1280",
+   "key": "yolo26m",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 21.9,
+   "ms_mean": 22.17,
+   "ms_p50": 20.77,
+   "ms_p90": 30.34,
+   "fps": 45.1,
+   "peak_mem_mb": 105.9
+  },
+  {
+   "model": "YOLO-World-S v2@640",
+   "key": "yolo_world_s",
+   "domain": "coco",
+   "precision": "fp32",
+   "params_m": 12.8,
+   "ms_mean": 16.19,
+   "ms_p50": 15.94,
+   "ms_p90": 21.85,
+   "fps": 61.8,
+   "peak_mem_mb": 113.0
+  },
+  {
+   "model": "YOLO-World-S v2@640",
+   "key": "yolo_world_s",
+   "domain": "coco",
+   "precision": "fp16",
+   "params_m": 12.8,
+   "ms_mean": 12.12,
+   "ms_p50": 11.15,
+   "ms_p90": 14.54,
+   "fps": 82.5,
+   "peak_mem_mb": 62.1
+  },
+  {
+   "model": "YOLO-World-S v2@1280",
+   "key": "yolo_world_s",
+   "domain": "kitti",
+   "precision": "fp32",
+   "params_m": 12.8,
+   "ms_mean": 23.37,
+   "ms_p50": 23.91,
+   "ms_p90": 28.9,
+   "fps": 42.8,
+   "peak_mem_mb": 126.0
+  },
+  {
+   "model": "YOLO-World-S v2@1280",
+   "key": "yolo_world_s",
+   "domain": "kitti",
+   "precision": "fp16",
+   "params_m": 12.8,
+   "ms_mean": 17.77,
+   "ms_p50": 14.11,
+   "ms_p90": 27.47,
+   "fps": 56.3,
+   "peak_mem_mb": 68.9
+  }
+ ]
+}

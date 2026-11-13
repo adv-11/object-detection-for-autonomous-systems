@@ -102,3 +102,130 @@ kitti__yolo11s_1280_ft25                      [prompt     ] AP  45.6  AP50  73.1
 | kitti__yolo_world_l_1280_vkittidesc | YOLO-World-L v2@1280    | open-vocabulary (CNN)  | kittidesc | prompt      | 21.9 |   42.8 |   21.2 |  21.1 |  23.0 |  31.8 |    44.6 |     52.0 |     10.1 |      3.6 |          81.7 |          56.3 |           7.7 |          48.6 |          76.1 |          42.5 |           9.8 |          42.8 |          62.5 |          36.7 |           9.3 |          36.2 |         93.3 |
 [2026-11-02 10:35:03] OVERNIGHT DONE
 ===== 2026-11-13 00:10:52 extension study: data vs vocabulary, label budgets =====
+[2026-11-13 00:11:02] uv run python scripts/run_inference.py --model dfine_s_coco --dataset coco
+  image = torch.from_numpy(image)
+{"wall_s": 207.9, "images_per_s": 24.05, "model_ms_mean": 40.6, "model_ms_median": 38.11, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=141.4MB dets=1500000
+[2026-11-13 00:15:09] uv run python scripts/run_inference.py --model dfine_s_o365 --dataset coco
+  image = torch.from_numpy(image)
+{"wall_s": 261.9, "images_per_s": 19.09, "model_ms_mean": 51.32, "model_ms_median": 48.84, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=141.4MB dets=1500000
+[2026-11-13 00:20:34] uv run python scripts/run_inference.py --model dfine_m_coco --dataset coco
+  image = torch.from_numpy(image)
+{"wall_s": 309.0, "images_per_s": 16.18, "model_ms_mean": 60.77, "model_ms_median": 58.51, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=188.9MB dets=1500000
+[2026-11-13 00:26:21] uv run python scripts/run_inference.py --model dfine_m_o365 --dataset coco
+  image = torch.from_numpy(image)
+{"wall_s": 305.1, "images_per_s": 16.39, "model_ms_mean": 59.95, "model_ms_median": 58.67, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=188.9MB dets=1500000
+[2026-11-13 00:32:03] uv run python scripts/run_inference.py --model yolo26s --dataset coco
+{"wall_s": 115.2, "images_per_s": 43.4, "model_ms_mean": 22.38, "model_ms_median": 22.4, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=121.4MB dets=657220
+[2026-11-13 00:34:19] uv run python scripts/run_inference.py --model yolo26m --dataset coco
+[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 3% ──────────── 1.5/42.2MB 15.0MB/s 0.1s<2.7s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 15% ━╸────────── 6.6/42.2MB 47.1MB/s 0.2s<0.8s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 27% ━━━───────── 11.8/42.2MB 33.1MB/s 0.4s<0.9s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 42% ━━━━━─────── 18.1/42.2MB 60.5MB/s 0.5s<0.4s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 47% ━━━━━╸────── 20.2/42.2MB 19.0MB/s 0.6s<1.2s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 52% ━━━━━━────── 22.2/42.2MB 19.3MB/s 0.7s<1.0s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 68% ━━━━━━━━──── 29.0/42.2MB 67.4MB/s 0.8s<0.2s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 80% ━━━━━━━━━╸── 34.1/42.2MB 50.9MB/s 0.9s<0.2s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 93% ━━━━━━━━━━━─ 39.3/42.2MB 52.3MB/s 1.0s<0.1s[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m.pt to 'C:\Users\Advait\det-eval-2d\weights\yolo26m.pt': 100% ━━━━━━━━━━━━ 42.2MB 40.4MB/s 1.0s
+{"wall_s": 120.1, "images_per_s": 41.64, "model_ms_mean": 23.44, "model_ms_median": 23.05, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=189.9MB dets=557021
+[2026-11-13 00:36:39] uv run python scripts/run_inference.py --model yolo_world_s --dataset coco
+{"wall_s": 110.6, "images_per_s": 45.22, "model_ms_mean": 21.13, "model_ms_median": 21.1, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=178.4MB dets=1035854
+[2026-11-13 00:38:58] uv run python scripts/run_inference.py --model dfine_s_coco --dataset kitti --imgsz 640
+  image = torch.from_numpy(image)
+{"wall_s": 184.5, "images_per_s": 20.43, "model_ms_mean": 47.8, "model_ms_median": 45.5, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=141.4MB dets=1130700
+[2026-11-13 00:42:33] uv run python scripts/run_inference.py --model dfine_s_coco --dataset kitti --imgsz 1280
+  image = torch.from_numpy(image)
+{"wall_s": 290.1, "images_per_s": 12.99, "model_ms_mean": 75.64, "model_ms_median": 73.23, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=418.5MB dets=1130700
+[2026-11-13 00:47:57] uv run python scripts/run_inference.py --model dfine_s_o365 --dataset kitti --imgsz 640
+  image = torch.from_numpy(image)
+{"wall_s": 177.2, "images_per_s": 21.27, "model_ms_mean": 45.94, "model_ms_median": 44.94, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=141.4MB dets=1130700
+[2026-11-13 00:51:29] uv run python scripts/run_inference.py --model dfine_s_o365 --dataset kitti --imgsz 1280
+  image = torch.from_numpy(image)
+{"wall_s": 285.5, "images_per_s": 13.2, "model_ms_mean": 74.4, "model_ms_median": 72.07, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=418.5MB dets=1130700
+[2026-11-13 00:56:49] uv run python scripts/run_inference.py --model dfine_m_coco --dataset kitti --imgsz 640
+  image = torch.from_numpy(image)
+{"wall_s": 229.4, "images_per_s": 16.43, "model_ms_mean": 59.69, "model_ms_median": 55.03, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=188.9MB dets=1130700
+[2026-11-13 01:01:13] uv run python scripts/run_inference.py --model dfine_m_coco --dataset kitti --imgsz 1280
+  image = torch.from_numpy(image)
+{"wall_s": 417.7, "images_per_s": 9.02, "model_ms_mean": 109.67, "model_ms_median": 108.08, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=501.6MB dets=1130700
+[2026-11-13 01:08:47] uv run python scripts/run_inference.py --model dfine_m_o365 --dataset kitti --imgsz 640
+  image = torch.from_numpy(image)
+{"wall_s": 242.5, "images_per_s": 15.54, "model_ms_mean": 63.1, "model_ms_median": 62.22, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=188.9MB dets=1130700
+[2026-11-13 01:13:24] uv run python scripts/run_inference.py --model dfine_m_o365 --dataset kitti --imgsz 1280
+  image = torch.from_numpy(image)
+{"wall_s": 400.5, "images_per_s": 9.41, "model_ms_mean": 104.93, "model_ms_median": 103.73, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=501.6MB dets=1130700
+[2026-11-13 01:20:40] uv run python scripts/run_inference.py --model yolo26s --dataset kitti --imgsz 640
+{"wall_s": 87.4, "images_per_s": 43.13, "model_ms_mean": 22.35, "model_ms_median": 21.97, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=103.5MB dets=718841
+[2026-11-13 01:22:29] uv run python scripts/run_inference.py --model yolo26s --dataset kitti --imgsz 1280
+{"wall_s": 84.5, "images_per_s": 44.63, "model_ms_mean": 21.61, "model_ms_median": 20.73, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=146.3MB dets=726599
+[2026-11-13 01:24:19] uv run python scripts/run_inference.py --model yolo26m --dataset kitti --imgsz 640
+{"wall_s": 82.8, "images_per_s": 45.55, "model_ms_mean": 21.3, "model_ms_median": 20.42, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=145.1MB dets=569059
+[2026-11-13 01:26:02] uv run python scripts/run_inference.py --model yolo26m --dataset kitti --imgsz 1280
+{"wall_s": 99.4, "images_per_s": 37.94, "model_ms_mean": 25.73, "model_ms_median": 24.81, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=213.9MB dets=532086
+[2026-11-13 01:28:03] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --vocab coco
+{"wall_s": 89.8, "images_per_s": 41.98, "model_ms_mean": 22.77, "model_ms_median": 22.09, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=142.4MB dets=945644
+[2026-11-13 01:30:10] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --vocab kitti
+{"wall_s": 87.0, "images_per_s": 43.31, "model_ms_mean": 22.43, "model_ms_median": 21.5, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=537867
+[2026-11-13 01:32:04] uv run python scripts/evaluate.py
+kitti__yolo_world_s_1280_vcoco                [direct     ] AP  24.9  AP50  45.2  KITTI-mod Car  81.9 Ped  54.7 Cyc   1.3
+kitti__yolo_world_s_1280_vkitti               [prompt     ] AP  24.6  AP50  49.2  KITTI-mod Car  82.0 Ped  40.1 Cyc  23.8
+[2026-11-13 01:59:38] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 0
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f0.05[0m
+{"name": "yolo11s_kitti_1280_e20_f0.05", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 0, "name": null}, "train_hours": 0.1, "peak_mem_gb": 4.63, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.05\\weights\\last.pt"}
+[2026-11-13 02:05:44] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f0.05/weights/last.pt --tag ft5_s0
+{"wall_s": 79.4, "images_per_s": 47.49, "model_ms_mean": 20.49, "model_ms_median": 19.87, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=460301
+[2026-11-13 02:07:25] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 0
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.05[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.05", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 0, "name": null}, "train_hours": 0.09, "peak_mem_gb": 4.12, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.05\\weights\\last.pt"}
+[2026-11-13 02:12:46] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.05/weights/last.pt --tag ft5_s0
+{"wall_s": 81.1, "images_per_s": 46.49, "model_ms_mean": 20.98, "model_ms_median": 20.25, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=417329
+[2026-11-13 02:14:25] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25 --seed 0
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.25[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.25", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.25, "seed": 0, "name": null}, "train_hours": 0.32, "peak_mem_gb": 4.21, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.25\\weights\\last.pt"}
+[2026-11-13 02:33:51] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.25/weights/last.pt --tag ft25_s0
+{"wall_s": 78.9, "images_per_s": 47.77, "model_ms_mean": 20.65, "model_ms_median": 19.9, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=169144
+[2026-11-13 02:35:24] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 1
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f0.05_s1[0m
+{"name": "yolo11s_kitti_1280_e20_f0.05_s1", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 1, "name": null}, "train_hours": 0.08, "peak_mem_gb": 4.62, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.05_s1\\weights\\last.pt"}
+[2026-11-13 02:40:33] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f0.05_s1/weights/last.pt --tag ft5_s1
+{"wall_s": 73.9, "images_per_s": 50.98, "model_ms_mean": 19.14, "model_ms_median": 18.4, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=332141
+[2026-11-13 02:42:03] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 1
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.05_s1[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.05_s1", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 1, "name": null}, "train_hours": 0.09, "peak_mem_gb": 4.13, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.05_s1\\weights\\last.pt"}
+[2026-11-13 02:47:24] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.05_s1/weights/last.pt --tag ft5_s1
+{"wall_s": 80.3, "images_per_s": 46.94, "model_ms_mean": 20.89, "model_ms_median": 20.34, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=284409
+[2026-11-13 02:49:00] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25 --seed 1
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f0.25_s1[0m
+{"name": "yolo11s_kitti_1280_e20_f0.25_s1", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.25, "seed": 1, "name": null}, "train_hours": 0.3, "peak_mem_gb": 4.62, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.25_s1\\weights\\last.pt"}
+[2026-11-13 03:06:48] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f0.25_s1/weights/last.pt --tag ft25_s1
+{"wall_s": 72.7, "images_per_s": 51.86, "model_ms_mean": 19.03, "model_ms_median": 18.47, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=139081
+[2026-11-13 03:08:14] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25 --seed 1
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.25_s1[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.25_s1", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.25, "seed": 1, "name": null}, "train_hours": 0.32, "peak_mem_gb": 4.21, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.25_s1\\weights\\last.pt"}
+[2026-11-13 03:27:47] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.25_s1/weights/last.pt --tag ft25_s1
+{"wall_s": 79.6, "images_per_s": 47.34, "model_ms_mean": 20.84, "model_ms_median": 20.22, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=171663
+[2026-11-13 03:29:21] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 2
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f0.05_s2[0m
+{"name": "yolo11s_kitti_1280_e20_f0.05_s2", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 2, "name": null}, "train_hours": 0.09, "peak_mem_gb": 4.62, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.05_s2\\weights\\last.pt"}
+[2026-11-13 03:34:35] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f0.05_s2/weights/last.pt --tag ft5_s2
+{"wall_s": 74.9, "images_per_s": 50.33, "model_ms_mean": 19.53, "model_ms_median": 18.8, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=261345
+[2026-11-13 03:36:07] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.05 --seed 2
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.05_s2[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.05_s2", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.05, "seed": 2, "name": null}, "train_hours": 0.09, "peak_mem_gb": 4.27, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.05_s2\\weights\\last.pt"}
+[2026-11-13 03:41:31] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.05_s2/weights/last.pt --tag ft5_s2
+{"wall_s": 80.8, "images_per_s": 46.67, "model_ms_mean": 20.97, "model_ms_median": 20.28, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=343649
+[2026-11-13 03:43:09] uv run python scripts/finetune_yolo.py --model yolo11s.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25 --seed 2
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolo11s_kitti_1280_e20_f0.25_s2[0m
+{"name": "yolo11s_kitti_1280_e20_f0.25_s2", "args": {"model": "yolo11s.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.25, "seed": 2, "name": null}, "train_hours": 0.3, "peak_mem_gb": 4.62, "weights": "runs\\finetune\\yolo11s_kitti_1280_e20_f0.25_s2\\weights\\last.pt"}
+[2026-11-13 04:00:58] uv run python scripts/run_inference.py --model yolo11s --dataset kitti --imgsz 1280 --weights runs/finetune/yolo11s_kitti_1280_e20_f0.25_s2/weights/last.pt --tag ft25_s2
+{"wall_s": 73.1, "images_per_s": 51.56, "model_ms_mean": 19.14, "model_ms_median": 18.49, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=122.9MB dets=137602
+[2026-11-13 04:02:25] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 0.25 --seed 2
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f0.25_s2[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f0.25_s2", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 0.25, "seed": 2, "name": null}, "train_hours": 0.32, "peak_mem_gb": 4.21, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f0.25_s2\\weights\\last.pt"}
+[2026-11-13 04:21:52] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f0.25_s2/weights/last.pt --tag ft25_s2
+{"wall_s": 79.9, "images_per_s": 47.17, "model_ms_mean": 20.92, "model_ms_median": 20.09, "note": "per-image predict() incl. pre/post-processing, batch 1, FP32, image decode excluded"} peak_mem=139.7MB dets=156326
+[2026-11-13 04:23:26] uv run python scripts/evaluate.py
+kitti__yolo_world_s_1280_ft5_s1               [prompt     ] AP  41.7  AP50  70.3  KITTI-mod Car  91.8 Ped  72.7 Cyc  54.1
+kitti__yolo_world_s_1280_ft5_s2               [prompt     ] AP  40.5  AP50  68.2  KITTI-mod Car  91.8 Ped  71.6 Cyc  46.4
+[2026-11-13 04:26:49] uv run python scripts/benchmark_speed.py --ext
+{'model': 'YOLO-World-S v2@1280', 'key': 'yolo_world_s', 'domain': 'kitti', 'precision': 'fp32', 'params_m': 12.8, 'ms_mean': 23.37, 'ms_p50': 23.91, 'ms_p90': 28.9, 'fps': 42.8, 'peak_mem_mb': 126.0}
+{'model': 'YOLO-World-S v2@1280', 'key': 'yolo_world_s', 'domain': 'kitti', 'precision': 'fp16', 'params_m': 12.8, 'ms_mean': 17.77, 'ms_p50': 14.11, 'ms_p90': 27.47, 'fps': 56.3, 'peak_mem_mb': 68.9}
+[2026-11-13 04:52:27] uv run python scripts/finetune_yolo.py --model yolov8s-worldv2.pt --imgsz 1280 --epochs 20 --batch 4 --fraction 1.0 --seed 0
+Results saved to [1mC:\Users\Advait\det-eval-2d\runs\finetune\yolov8s-worldv2_kitti_1280_e20_f1[0m
+{"name": "yolov8s-worldv2_kitti_1280_e20_f1", "args": {"model": "yolov8s-worldv2.pt", "imgsz": 1280, "epochs": 20, "batch": 4, "fraction": 1.0, "seed": 0, "name": null}, "train_hours": 1.24, "peak_mem_gb": 4.14, "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f1\\weights\\last.pt"}
+[2026-11-13 06:07:10] uv run python scripts/run_inference.py --model yolo_world_s --dataset kitti --imgsz 1280 --weights runs/finetune/yolov8s-worldv2_kitti_1280_e20_f1.0/weights/last.pt --tag ft
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f1.0\\weights\\last.pt'
+[2026-11-13 06:07:15] uv run python scripts/evaluate.py
+[2026-11-13 06:07:17] EXTENSION DONE

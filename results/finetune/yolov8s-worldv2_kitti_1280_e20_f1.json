@@ -1,0 +1,15 @@
+{
+ "name": "yolov8s-worldv2_kitti_1280_e20_f1",
+ "args": {
+  "model": "yolov8s-worldv2.pt",
+  "imgsz": 1280,
+  "epochs": 20,
+  "batch": 4,
+  "fraction": 1.0,
+  "seed": 0,
+  "name": null
+ },
+ "train_hours": 1.24,
+ "peak_mem_gb": 4.14,
+ "weights": "runs\\finetune\\yolov8s-worldv2_kitti_1280_e20_f1\\weights\\last.pt"
+}

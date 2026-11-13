@@ -20,7 +20,7 @@ step uv run python scripts/evaluate.py
 # ---- B. label budgets x seeds (YOLO11s 25% seed 0 already exists: kitti__yolo11s_1280_ft25)
 ft() {  # model-file model-key fraction seed tag
   step uv run python scripts/finetune_yolo.py --model $1 --imgsz 1280 --epochs 20 --batch 4 --fraction $3 --seed $4
-  local name="${1%.pt}_kitti_1280_e20_f$3"; [ "$4" != "0" ] && name="${name}_s$4"
+  local name="${1%.pt}_kitti_1280_e20_f$(printf %g $3)"; [ "$4" != "0" ] && name="${name}_s$4"
   inf --model $2 --dataset kitti --imgsz 1280 --weights $FT/$name/weights/last.pt --tag $5
 }
 for seed in 0 1 2; do
