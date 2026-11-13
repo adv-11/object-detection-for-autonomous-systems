@@ -1,7 +1,7 @@
 # 2D Object Detection: SOTA Evaluation and Cross-Domain Generalization (COCO → KITTI)
 
 CMPE 249 (Intelligent Autonomous Systems), Track A: experimental model evaluation.
-**Report:** [`report/report.pdf`](report/report.pdf)
+**Report:** [`report/report.pdf`](report/report.pdf) · **Extension study:** [`report/extension.pdf`](report/extension.pdf)
 
 Eight COCO-trained detector configurations from six families — Faster R-CNN v2, RetinaNet v2, FCOS, YOLO11s/m, RT-DETR-L,
 YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol on **COCO val2017** and, without retraining, on
@@ -29,6 +29,25 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 * Fine-tuning YOLO11s for 20 epochs at 1280 px lifts it from 64.4 to 75.5 Moderate mAP (77.0 with a quarter of the labels), mostly by
   fixing localisation at KITTI's 0.7 Car IoU.
 * FP16 speeds up the heavier models 1.1–1.6× on this GPU; batch-1 YOLO latency (~23 ms) is bound by Python pre/post-processing.
+
+## Extension study: data, not vocabulary?
+
+[`report/extension.pdf`](report/extension.pdf) (6 pages) follows up on the main report with the same protocol and metric code:
+
+* **Pre-training data, architecture fixed.** D-FINE-S/M trained on COCO only vs. pre-trained on Objects365 first: +2.2–2.8 COCO AP
+  but +7.4–10.6 KITTI Moderate mAP at 1280 px. D-FINE-M (Objects365) reaches **72.7**, the best zero-shot KITTI result in either study,
+  from a closed-set model. Broad pre-training data, not an open vocabulary, is the more likely cause of the open-vocabulary advantage.
+* **YOLO26 vs. YOLO11:** +1.7–1.8 COCO AP, only +0.4–0.8 KITTI Moderate mAP at 1280 px.
+* **Label budgets, 3 seeds (1280 px, 20 epochs).** YOLO-World-S beats YOLO11s with 5% of KITTI labels (71.3 ± 1.5 vs. 67.2 ± 2.1,
+  Welch p = 0.054). The gap closes by 25% and is gone at 100% (75.3 vs. 75.5).
+* **Seed check.** Across three seeds, YOLO11s with 25% of the labels averages 75.0 ± 1.8. That matches full data (75.5) but does not beat it: the
+  main report's single-seed 77.0 was the best of the three. Cyclist AP varies by up to 10 points between seeds.
+
+```bash
+bash scripts/run_extension.sh                          # all extension runs (~6.5 h on an RTX 5060 Laptop)
+uv run python scripts/summarize_extension.py           # results/tables/ext_*.md, figures/ext_*.png
+bash report/build.sh extension                         # report/extension.pdf
+```
 
 ## Reproduce
 
@@ -78,7 +97,8 @@ peak memory is in [`logs/command_log.txt`](logs/command_log.txt).
 
 ## Scope note
 
-Single 8-GB laptop GPU. Fine-tuning uses YOLO11s with one seed per configuration (YOLO11m at 1280 px does not fit in 8 GB for training).
+Single 8-GB laptop GPU. The main report fine-tunes YOLO11s with one seed per configuration (YOLO11m at 1280 px does not fit in 8 GB
+for training); the extension study repeats the 5% / 25% budgets with three seeds.
 Raw prediction files (`results/raw/`) and weights are not committed (size); every metric file records how to regenerate them.
 
 ## Data splits
