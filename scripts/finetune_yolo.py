@@ -22,7 +22,7 @@ import json
 import time
 
 import torch
-from ultralytics import RTDETR, YOLO
+from ultralytics import RTDETR, YOLO, YOLOWorld
 
 from det_eval.data import DATA, ROOT
 from det_eval.detectors import WEIGHTS
@@ -39,8 +39,9 @@ def main():
     ap.add_argument("--name", default=None)
     args = ap.parse_args()
 
-    name = args.name or f"{args.model.removesuffix('.pt')}_kitti_{args.imgsz}_e{args.epochs}_f{args.fraction:g}"
-    cls = RTDETR if "rtdetr" in args.model else YOLO
+    name = args.name or (f"{args.model.removesuffix('.pt')}_kitti_{args.imgsz}_e{args.epochs}_f{args.fraction:g}"
+                         + (f"_s{args.seed}" if args.seed else ""))  # seed 0 keeps the original name
+    cls = RTDETR if "rtdetr" in args.model else (YOLOWorld if "world" in args.model else YOLO)
     model = cls(str(WEIGHTS / args.model))
     t0 = time.time()
     model.train(

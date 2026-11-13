@@ -39,6 +39,18 @@ CONFIGS = [  # (model key, build kwargs, domains)
     ("yolo_world_l", {"imgsz": 1280}, ["kitti"]),
     ("grounding_dino_t", {}, ["coco", "kitti"]),
 ]
+# Extension study models (``--ext``): newest real-time detectors and YOLO-World-S.
+EXT_CONFIGS = [
+    ("dfine_s_coco", {"imgsz": 640}, ["coco", "kitti"]),
+    ("dfine_m_coco", {"imgsz": 640}, ["coco", "kitti"]),
+    ("dfine_m_coco", {"imgsz": 1280}, ["kitti"]),
+    ("yolo26s", {"imgsz": 640}, ["coco", "kitti"]),
+    ("yolo26s", {"imgsz": 1280}, ["kitti"]),
+    ("yolo26m", {"imgsz": 640}, ["coco", "kitti"]),
+    ("yolo26m", {"imgsz": 1280}, ["kitti"]),
+    ("yolo_world_s", {"imgsz": 640}, ["coco"]),
+    ("yolo_world_s", {"imgsz": 1280}, ["kitti"]),
+]
 N_IMAGES = 100
 
 
@@ -83,10 +95,13 @@ def bench(det, imgs):
 
 
 def main():
+    import sys
+
+    ext = "--ext" in sys.argv
     torch.backends.cudnn.benchmark = True
     data = {d: images(d) for d in ("coco", "kitti")}
     rows = []
-    for key, kw, domains in CONFIGS:
+    for key, kw, domains in (EXT_CONFIGS if ext else CONFIGS):
         for half in (False, True):
             det = detectors.build(key, half=half, **kw)
             for domain in domains:
@@ -106,7 +121,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     meta = dict(gpu=torch.cuda.get_device_name(0), nvidia_smi=gpu_state(), torch=torch.__version__,
                 n_images=N_IMAGES, warmup="1 full pass", batch=1, cudnn_benchmark=True)
-    (out / "speed.json").write_text(json.dumps(dict(meta=meta, rows=rows), indent=1))
+    (out / ("speed_ext.json" if ext else "speed.json")).write_text(json.dumps(dict(meta=meta, rows=rows), indent=1))
 
 
 if __name__ == "__main__":

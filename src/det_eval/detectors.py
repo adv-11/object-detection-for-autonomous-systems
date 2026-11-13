@@ -289,6 +289,54 @@ class GroundingDinoDetector(Detector):
         ).topk()
 
 
+# --------------------------------------------------------------------------- D-FINE (HF)
+# The HF D-FINE configs use PASCAL-VOC spellings for six COCO classes.
+VOC_TO_COCO = {"motorbike": "motorcycle", "aeroplane": "airplane", "sofa": "couch", "pottedplant": "potted plant",
+               "diningtable": "dining table", "tvmonitor": "tv"}
+
+
+class DFineDetector(Detector):
+    """D-FINE via Hugging Face transformers (RT-DETR-style set prediction, no NMS).
+
+    The processor stretches the frame to a square ``imgsz``; predicted boxes are normalised
+    cxcywh, so they map back by the original width/height. Scores are sigmoid class
+    probabilities; the top 300 (query, class) pairs are kept, as in the official post-processor.
+    """
+
+    def __init__(self, name, family, hf_id, imgsz=640, half=False):
+        from transformers import AutoImageProcessor, AutoModelForObjectDetection
+
+        self.processor = AutoImageProcessor.from_pretrained(hf_id, cache_dir=WEIGHTS / "hf")
+        self.model = AutoModelForObjectDetection.from_pretrained(hf_id, cache_dir=WEIGHTS / "hf").eval().cuda()
+        self.imgsz = imgsz
+        id2label = self.model.config.id2label
+        super().__init__(
+            name=name,
+            family=family,
+            checkpoint=f"huggingface {hf_id}",
+            framework="transformers",
+            input_desc=f"stretch to {imgsz}x{imgsz} (no aspect preservation)",
+            nms_iou=None,
+            class_names=[VOC_TO_COCO.get(id2label[i], id2label[i]) for i in range(len(id2label))],
+            half=half,
+        )
+
+    @torch.inference_mode()
+    def predict(self, img):
+        h, w = img.shape[:2]
+        inputs = self.processor(images=img, size={"height": self.imgsz, "width": self.imgsz}, return_tensors="pt").to("cuda")
+        with torch.autocast("cuda", dtype=torch.float16, enabled=self.half):
+            out = self.model(**inputs)
+        prob = out.logits[0].float().sigmoid()  # (Q, C)
+        scores, flat = prob.flatten().topk(min(MAX_RAW, prob.numel()))
+        q, c = flat // prob.shape[1], flat % prob.shape[1]
+        b = out.pred_boxes[0].float()[q]
+        boxes = torch.stack([(b[:, 0] - b[:, 2] / 2) * w, (b[:, 1] - b[:, 3] / 2) * h,
+                             (b[:, 0] + b[:, 2] / 2) * w, (b[:, 1] + b[:, 3] / 2) * h], dim=1)
+        keep = scores >= SCORE_THRESH
+        return Detections(boxes[keep].cpu().numpy(), scores[keep].cpu().numpy(), c[keep].cpu().numpy().astype(np.int64))
+
+
 # --------------------------------------------------------------------------- registry
 REGISTRY = {
     # two-stage CNN
@@ -304,6 +352,14 @@ REGISTRY = {
     # open-vocabulary
     "yolo_world_l": lambda imgsz=640, **kw: UltralyticsDetector(f"YOLO-World-L v2@{imgsz}", "open-vocabulary (CNN)", "yolov8l-worldv2.pt", imgsz, open_vocab=True, **kw),
     "grounding_dino_t": lambda **kw: GroundingDinoDetector("Grounding DINO-T", "open-vocabulary (DETR)", "IDEA-Research/grounding-dino-tiny", **kw),
+    # extension study: newest real-time detectors and a pretraining-data control
+    "yolo26s": lambda imgsz=640, **kw: UltralyticsDetector(f"YOLO26s@{imgsz}", "real-time YOLO", "yolo26s.pt", imgsz, **kw),
+    "yolo26m": lambda imgsz=640, **kw: UltralyticsDetector(f"YOLO26m@{imgsz}", "real-time YOLO", "yolo26m.pt", imgsz, **kw),
+    "yolo_world_s": lambda imgsz=640, **kw: UltralyticsDetector(f"YOLO-World-S v2@{imgsz}", "open-vocabulary (CNN)", "yolov8s-worldv2.pt", imgsz, open_vocab=True, **kw),
+    "dfine_s_coco": lambda imgsz=640, **kw: DFineDetector(f"D-FINE-S COCO@{imgsz}", "real-time DETR", "ustc-community/dfine-small-coco", imgsz, **kw),
+    "dfine_s_o365": lambda imgsz=640, **kw: DFineDetector(f"D-FINE-S O365+COCO@{imgsz}", "real-time DETR", "ustc-community/dfine-small-obj2coco", imgsz, **kw),
+    "dfine_m_coco": lambda imgsz=640, **kw: DFineDetector(f"D-FINE-M COCO@{imgsz}", "real-time DETR", "ustc-community/dfine-medium-coco", imgsz, **kw),
+    "dfine_m_o365": lambda imgsz=640, **kw: DFineDetector(f"D-FINE-M O365+COCO@{imgsz}", "real-time DETR", "ustc-community/dfine-medium-obj2coco", imgsz, **kw),
 }
 
 
