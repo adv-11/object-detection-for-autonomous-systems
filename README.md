@@ -15,7 +15,7 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 | YOLO11m | 51.0 / 51.5 | 57.7 (640) · 65.3 (1280) |
 | Grounding DINO-T | 48.3 / 48.4 | **70.5** (COCO names + mapping) · 39.9 (KITTI-name prompts) |
 | Faster R-CNN R50-FPN v2 | 46.9 / 46.7 | 58.8 |
-| YOLO11s | 46.1 / 47.0 | 52.1 (640) · 64.4 (1280) → **75.5 fine-tuned** (77.0 with 25% of labels) |
+| YOLO11s | 46.1 / 47.0 | 52.1 (640) · 64.4 (1280) → **75.5 fine-tuned** (≈ same with 25% of labels: 75.0 ± 1.8, 3 seeds) |
 | YOLO-World-L v2 | 45.1 / 45.1 | **70.9** (COCO names + mapping) · 46.4 (KITTI-name prompts) |
 | RetinaNet R50-FPN v2 | 41.4 / 41.5 | 56.1 |
 | FCOS R50-FPN | 39.2 / 39.2 | 53.7 |
@@ -26,7 +26,7 @@ YOLO-World-L v2 and Grounding DINO-T — are evaluated under one shared protocol
 * Mapping COCO `bicycle` to KITTI Cyclist naively gives <1 AP; fusing rider and bike gives up to 68.
 * The open-vocabulary models (sixth and third on COCO) are the best zero-shot KITTI detectors, but prompting them with KITTI class names
   instead of COCO names costs 25–31 points.
-* Fine-tuning YOLO11s for 20 epochs at 1280 px lifts it from 64.4 to 75.5 Moderate mAP (77.0 with a quarter of the labels), mostly by
+* Fine-tuning YOLO11s for 20 epochs at 1280 px lifts it from 64.4 to 75.5 Moderate mAP (a quarter of the labels matches this), mostly by
   fixing localisation at KITTI's 0.7 Car IoU.
 * FP16 speeds up the heavier models 1.1–1.6× on this GPU; batch-1 YOLO latency (~23 ms) is bound by Python pre/post-processing.
 

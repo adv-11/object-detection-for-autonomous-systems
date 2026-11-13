@@ -15,8 +15,8 @@ lose about two-thirds of their AP, through a mix of taxonomy mismatch, annotatio
 zero-shot levers are not architectural: keeping KITTI's wide frames at 1280 px adds 7.6 Moderate mAP to YOLO11m, and the COCO→KITTI
 Cyclist mapping alone swings Cyclist AP by up to 67 points. The two open-vocabulary detectors, sixth and third on COCO, are the best
 zero-shot KITTI detectors (70.9 and 70.5 Moderate mAP), yet prompting them with KITTI's own class names is 25–31 points worse than using
-COCO names and a geometric mapping. Fine-tuning YOLO11s on KITTI at 1280 px lifts it from 64.4 to 75.5 Moderate mAP — and to 77.0 with
-only a quarter of the labels — mostly by fixing localisation at KITTI's 0.7 Car IoU. An
+COCO names and a geometric mapping. Fine-tuning YOLO11s on KITTI at 1280 px lifts it from 64.4 to 75.5 Moderate mAP — and a quarter of
+the labels gives the same accuracy — mostly by fixing localisation at KITTI's 0.7 Car IoU. An
 adversarial review of the evaluation code found and fixed an ignore-rule bug before any result was reported.
 
 </div>
@@ -153,7 +153,7 @@ The last three rows are fine-tuned models (Section 5.6).</p>
 
 Without retraining, every detector loses 29–47% of its COCO-style AP on KITTI (Table 3), but the loss is very unevenly
 distributed across classes and scales (Section 5.1). The best zero-shot results come from the open-vocabulary models (YOLO-World-L 70.9, Grounding DINO-T 70.5 Moderate mAP); the best
-closed-set ones are YOLO11m and RT-DETR-L at 1280 px (65.3 each). All remain below a fine-tuned YOLO11s (75.5–77.0; Section 5.6).
+closed-set ones are YOLO11m and RT-DETR-L at 1280 px (65.3 each). All remain below a fine-tuned YOLO11s (75.5; Section 5.6).
 
 # 5. Technical analyses
 
@@ -251,9 +251,10 @@ Moderate mAP (Figure 4). Car gains the most (77.1 → 93.8 Moderate) even though
 localisation — the share of matched cars whose IoU falls below KITTI's 0.7 threshold drops from 18% to 4% (Section 6), and Car AP75
 nearly doubles. Cyclist rises from 46.9 to 59.3 because the model now predicts KITTI's rider-plus-bike box directly; Pedestrian gains least
 (69.0 → 73.5) and its recall on pedestrians shorter than 25 px actually falls (66% → 3%), while recall on heavily occluded people rises.
-**Labels are not the bottleneck:** the same schedule on 25% of the training images (0.38 h) reaches 77.0 Moderate mAP — Car and
-Pedestrian within 3 points of the full run and Cyclist higher (66.9 vs. 59.3). With one seed and ~900 validation cyclists this
-difference is within run-to-run noise; the robust conclusion is that ~900 labelled frames recover essentially all of the gain (even 5 epochs at 640 px reach 65.8).
+**Labels are not the bottleneck:** the same schedule on 25% of the training images (0.38 h) reaches 77.0 Moderate mAP in the run
+shown here, but repeated with three seeds in our companion extension study it averages 75.0 ± 1.8 (77.0 was the best seed; Cyclist
+varies by up to 10 points). A quarter of the labels therefore *matches* the full set rather than beating it: ~900 labelled frames
+recover essentially all of the gain (even 5 epochs at 640 px reach 65.8).
 **For a fixed deployment budget, a little in-domain fine-tuning is worth more than a larger model, a larger input or a broader
 pre-training corpus** — the fine-tuned 9-M-parameter YOLO11s beats both open-vocabulary models by 5–7 points at a fraction of their cost.
 
@@ -286,8 +287,8 @@ orange: Pedestrian, aqua: Cyclist; grey dotted: ignore regions. Left to right: g
 
 # 7. Limitations
 
-All experiments ran on a single 8-GB laptop GPU. Fine-tuning uses one model (YOLO11s) and a single seed per configuration, so
-differences of a few points between the 25% and 100% runs are within noise; YOLO11m at 1280 px did not fit in memory for training.
+All experiments ran on a single 8-GB laptop GPU. Fine-tuning here uses one model (YOLO11s) and a single seed per configuration; three seeds
+(extension study) put the seed spread at ~2 Moderate mAP and up to 10 Cyclist AP; YOLO11m at 1280 px did not fit in memory for training.
 Latency is batch-1 eager PyTorch with Python overhead on a 45-W GPU (each model timed in one contiguous warm block) and should be
 read as relative, not absolute. KITTI AP is computed with pycocotools (40-point recall grid, devkit ignore rules reproduced and unit-tested) but was not
 cross-checked against the official C++ binary on full predictions. The open-vocabulary models' "zero-shot" COCO results carry the
@@ -304,8 +305,8 @@ image-overlap caveat of their grounding data.
 4. **Broad open-vocabulary pre-training transfers better than COCO accuracy, but prompts are not a substitute for a mapping:**
    YOLO-World-L and Grounding DINO-T are the best zero-shot KITTI detectors (70.9 / 70.5 Moderate mAP), yet prompting them with KITTI's
    own class names costs 25–31 Moderate mAP relative to COCO names plus a geometric mapping.
-5. **Modest fine-tuning beats everything else:** 20 epochs at 1280 px lift YOLO11s from 64.4 to 75.5 Moderate mAP (77.0 with a quarter
-   of the labels), mostly by fixing localisation at KITTI's 0.7 IoU, so a 9-M-parameter model beats every zero-shot detector.
+5. **Modest fine-tuning beats everything else:** 20 epochs at 1280 px lift YOLO11s from 64.4 to 75.5 Moderate mAP (a quarter
+   of the labels matches this), mostly by fixing localisation at KITTI's 0.7 IoU, so a 9-M-parameter model beats every zero-shot detector.
 6. **Evaluation code deserves the same scrutiny as models:** an adversarial review caught an ignore-rule bug that would have inflated every
    KITTI number before any result was reported.
 
